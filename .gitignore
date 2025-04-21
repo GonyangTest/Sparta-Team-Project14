@@ -1,0 +1,64 @@
+## 기본 Visual Studio 관련
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## 빌드 결과물
+[Bb]in/
+[Oo]bj/
+*.dll
+*.exe
+*.app
+*.pdb
+*.cache
+*.ilk
+*.log
+*.tmp
+
+## NuGet 관련
+*.nupkg
+*.snupkg
+*.nuspec
+*.psmdcp
+packages/
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+## Resharper
+_ReSharper*/
+*.DotSettings.user
+
+## Rider
+.idea/
+
+## 기타 무시해도 되는 파일들
+*.db
+*.sqlite
+*.bak
+*.log
+*.vspscc
+*.vssscc
+*.class
+*.swp
+*.DS_Store
+*.sdf
+
+# 환경 설정 파일
+appsettings.Development.json
+appsettings.Local.json
+secrets.json
+.env
+
+# Test 결과물
+TestResults/
+*.coverage
+*.coveragexml
+
+# Publish 결과물
+publish/
+
+# macOS용 무시 항목
+.DS_Store

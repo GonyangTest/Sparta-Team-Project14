@@ -12,7 +12,8 @@ namespace SpartaDungeon.Core.Data
         private static ItemDataBase? _instance = null;
 
         private Dictionary<int, BaseItem> items;
-        private const string ITEM_lIST_FILE = "C:\\Users\\park\\source\\repos\\SpartaDungeon\\SpartaDungeon\\Resource\\Items.csv";
+        //private const string ITEM_lIST_FILE = "C:\\Users\\park\\source\\repos\\SpartaDungeon\\SpartaDungeon\\Resource\\Items.csv";
+        private readonly string ITEM_lIST_FILE = "..\\..\\..\\Resource\\Items.csv";
 
         public static ItemDataBase Instance
         {

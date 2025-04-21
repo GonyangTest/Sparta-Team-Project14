@@ -41,5 +41,15 @@ namespace SpartaDungeon.Core.Enums
         hard,
         [Description("시작화면")]
         Intro,
+        [Description("취소")]
+        Cancel,
+        [Description("다음")]
+        Next,
+        [Description("공격")]
+        Attack,
+        [Description("스킬")]
+        Skill,
+        [Description("사용하기")]
+        Use,
     }
 }

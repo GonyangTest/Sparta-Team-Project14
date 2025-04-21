@@ -27,6 +27,12 @@ namespace SpartaDungeon.Managers
         Rest,
         [Description("던전클리어")]
         DungeonClear,
+        [Description("전투시작")]
+        BattleStart,
+        [Description("전투")]
+        Battle,
+        [Description("전투결과")]
+        BattleResult,
 
     }
     class SceneManager

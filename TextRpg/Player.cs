@@ -14,21 +14,53 @@ namespace TextRpg
         public int exp = 0; // 경험치
         public int gold = 10000; // 골드
         public int hp = 0; // 체력
-        public int mana = 0; // 마나
         public int power = 0; // 공격력
         public int defense = 0; // 방어력
-        public int maxHp = 100; // 최대 체력
-        public int maxMp = 100; // 최대 마나
-
         public int basePower = 0;
         public int baseDefense = 0;
-        public Item EquippedWeapon;
-        public Item EquippedArmor;
+        //추가스텟
+        public int mana = 0;
+        public int agility = 0; //민첩
+        public int maxHp = 100; // 최대 체력
+        public int maxMp = 100; // 최대 마나
+        public int maxExp = 10;
+        public int criticalChance = 0; //치명타 확률
+        public int criticalDamage = 160; //치명타 피해
+
         public ConsumableItem HealthPotion = new ConsumableItem("체력포션", "체력을 회복하는 포션", 50, ConsumableItem.OptionType.Health, 30, 3);
         public ConsumableItem ManaPotion = new ConsumableItem("마나포션", "마나를 회복하는 포션", 100, ConsumableItem.OptionType.Mana, 30, 3);
 
+        public Item EquippedWeapon;
+        public Item EquippedArmor;
+
+        // 체력 포션 사용
+        public bool UseHealthPotion()
+        {
+            if (hp >= maxHp)
+            {
+                Console.WriteLine("\n이미 최대체력입니다.");
+                return false;
+            }
+
+            return HealthPotion.Use(this);
+        }
+
+        // 마나 포션 사용
+        public bool UseManaPotion()
+        {
+            if (mana >= maxMp)
+            {
+                Console.WriteLine("\n이미 최대마나입니다.");
+                return false;
+            }
+
+            return ManaPotion.Use(this);
+        }
+
+
         public void SetPlayer()
         {
+
             while (true)
             {
                 bool isSave = true;
@@ -81,7 +113,7 @@ namespace TextRpg
                 Console.Clear();
                 Console.WriteLine("스파르타 던전에 오신 여러분 환영합니다.");
                 Console.WriteLine("원하시는 직업을 설정해주세요.\n");
-                Console.WriteLine("1.전사\n2.도적\n");
+                Console.WriteLine("1.전사\n2.도적\n3.궁수\n4.마법사\n");
                 Console.WriteLine("원하시는 행동을 입력해주세요.");
                 string job = Console.ReadLine();
                 int selectJob;
@@ -97,15 +129,39 @@ namespace TextRpg
                     {
                         case 1:
                             playerClass = "전사";
-                            hp = 125;
-                            basePower = 5;
-                            baseDefense = 5;
+                            hp = 100;
+                            basePower = 8;
+                            baseDefense = 6;
+                            agility = 0;
+                            mana = 50;
+                            criticalChance = 5;
                             break;
                         case 2:
                             playerClass = "도적";
                             hp = 100;
                             basePower = 4;
-                            baseDefense = 3;
+                            baseDefense = 5;
+                            agility = 20;
+                            mana = 50;
+                            criticalChance = 20;
+                            break;
+                        case 3:
+                            playerClass = "궁수";
+                            hp = 100;
+                            basePower = 6;
+                            baseDefense = 5;
+                            agility = 10;
+                            mana = 50;
+                            criticalChance = 10;
+                            break;
+                        case 4:
+                            playerClass = "마법사";
+                            hp = 100;
+                            basePower = 7;
+                            baseDefense = 4;
+                            agility = 0;
+                            mana = 80;
+                            criticalChance = 10;
                             break;
                         default:
                             Console.Clear();
@@ -114,7 +170,7 @@ namespace TextRpg
                             continue;
                     }
                     break;
-                } 
+                }
             }
         }
         public int totalPower
@@ -144,10 +200,12 @@ namespace TextRpg
                 $"이름: {playerName}\n" +
                 $"직업: {playerClass}\n" +
                 $"레벨: {level}\n" +
-                $"경험치: {exp}\n" +
+                $"경험치: {exp}/{maxExp}\n" +
                 $"체력: {hp}\n" +
+                $"마력: {mana}\n" +
                 $"공격력: {totalPower}\n" +
                 $"방어력: {totalDefense}\n" +
+                $"민첩: {agility}\n" +
                 $"장착 무기: {(EquippedWeapon != null ? EquippedWeapon.itemName : "없음")}\n" +
                 $"장착 방어구: {(EquippedArmor != null ? EquippedArmor.itemName : "없음")}\n" +
                 $"골드 : {gold}\n";
@@ -172,37 +230,10 @@ namespace TextRpg
                             Console.WriteLine("목록에 나온 숫자만 입력하세요.");
                             Console.ReadKey();
                             continue;
-
                     }
                 }
                 break;
             }
-
-        }
-
-
-        // 체력 포션 사용
-        public bool UseHealthPotion()
-        {
-            if (hp >= maxHp)
-            {
-                Console.WriteLine("\n이미 최대체력입니다.");
-                return false;
-            }
-            
-            return HealthPotion.Use(this);
-        }
-
-        // 마나 포션 사용
-        public bool UseManaPotion()
-        {
-            if (mana >= maxMp)
-            {
-                Console.WriteLine("\n이미 최대마나입니다.");
-                return false;
-            }
-            
-            return ManaPotion.Use(this);
         }
     }
 }

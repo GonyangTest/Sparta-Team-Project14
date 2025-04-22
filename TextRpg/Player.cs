@@ -24,8 +24,6 @@ namespace TextRpg
         public int maxHp = 100; // 최대 체력
         public int maxMp = 100; // 최대 마나
         public int maxExp = 10;
-        public int criticalChance = 0; //치명타 확률
-        public int criticalDamage = 160; //치명타 피해
 
         public ConsumableItem HealthPotion = new ConsumableItem("체력포션", "체력을 회복하는 포션", 50, ConsumableItem.OptionType.Health, 30, 3);
         public ConsumableItem ManaPotion = new ConsumableItem("마나포션", "마나를 회복하는 포션", 100, ConsumableItem.OptionType.Mana, 30, 3);
@@ -153,7 +151,6 @@ namespace TextRpg
                             baseDefense = 6;
                             agility = 0;
                             mana = 50;
-                            criticalChance = 5;
                             break;
                         case 2:
                             playerClass = "도적";
@@ -162,7 +159,6 @@ namespace TextRpg
                             baseDefense = 5;
                             agility = 20;
                             mana = 50;
-                            criticalChance = 20;
                             break;
                         case 3:
                             playerClass = "궁수";
@@ -171,7 +167,6 @@ namespace TextRpg
                             baseDefense = 5;
                             agility = 10;
                             mana = 50;
-                            criticalChance = 10;
                             break;
                         case 4:
                             playerClass = "마법사";
@@ -180,7 +175,6 @@ namespace TextRpg
                             baseDefense = 4;
                             agility = 0;
                             mana = 80;
-                            criticalChance = 10;
                             break;
                         default:
                             Console.Clear();

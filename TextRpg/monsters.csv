@@ -1,0 +1,4 @@
+Type,Name,MaxHP,Attack,Defense,Speed
+Goblin,고블린,30,5,2,3
+FireGoblin,불의 고블린,35,7,1,4
+Troll,트롤,80,15,5,1

@@ -28,7 +28,9 @@ namespace TextRpg
             new Armor("스파르타의 갑옷", 15, "스파르타의 전사들이 사용했다는 전설의 갑옷입니다.", 3500, false),
             new Weapon("낡은 검", 2, "쉽게 볼 수 있는 낡은 검 입니다.", 600, false),
             new Weapon("청동 도끼", 5, "어디선가 사용됐던거 같은 도끼입니다.", 1500, false),
-            new Weapon("스파르타의 창", 7, "스파르타의 전사들이 사용했다는 전설의 창입니다.", 4000, false)
+            new Weapon("스파르타의 창", 7, "스파르타의 전사들이 사용했다는 전설의 창입니다.", 4000, false),
+            new ConsumableItem("체력 포션", "체력을 회복하는 포션입니다.", 50, ConsumableItem.OptionType.Health, 30),
+            new ConsumableItem("마나 포션", "마나를 회복하는 포션입니다.", 100, ConsumableItem.OptionType.Mana, 30)
             };
 
         }
@@ -122,7 +124,27 @@ namespace TextRpg
 
                 selectedItem = items[buyTmp - 1]; // items리스트의 타입이 Item이므로 Item형의 변수를 생성하고 입력받은 값을 items 리스트의 인덱스에 접근시킨다.
 
-                if (selectedItem.isPurchased) // 선택한 아이템(선택한 리스트의 인덱스)가 이미 구매했는지에 대한 여부를 확인하는 조건문
+                if (selectedItem is ConsumableItem) // 소비 아이템(포션)인 경우 isPurchased 상관없이 구매 가능
+                {
+                    if (_player.gold >= selectedItem.price) // 플레이어가 가지고 있는 골드가 아이템 가격보다 많이 가지고 있을 경우
+                    {
+                        _player.gold -= selectedItem.price; // 플레이어 골드에 아이템 가격을 빼준다.
+                        if (selectedItem.itemName.Contains("체력"))
+                        {
+                            _player.HealthPotion.Quantity++;
+                        }
+                        else
+                        {
+                            _player.ManaPotion.Quantity++;
+                        }
+                        Console.WriteLine($"{selectedItem.itemName} 을(를) 구매했습니다!");
+                    }
+                    else
+                    {
+                        Console.WriteLine("골드가 부족합니다!");
+                    }
+                }
+                else if (selectedItem.isPurchased) // 선택한 아이템(선택한 리스트의 인덱스)가 이미 구매했는지에 대한 여부를 확인하는 조건문
                 {
                     Console.WriteLine("이미 구매한 아이템입니다.");
                 }

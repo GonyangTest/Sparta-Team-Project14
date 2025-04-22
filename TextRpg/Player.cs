@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace TextRpg
 {
+
     class Player
     {
         public string playerName = ""; // 이름
@@ -20,10 +21,10 @@ namespace TextRpg
         public int baseDefense = 0;
         //추가스텟
         public int mana = 0;
-        public int agility = 0; //민첩
+        public int agility = 0; // 민첩
         public int maxHp = 100; // 최대 체력
         public int maxMp = 100; // 최대 마나
-        public int maxExp = 10;
+        public int maxExp = 10; // 최대 경험치
 
         public ConsumableItem HealthPotion = new ConsumableItem("체력포션", "체력을 회복하는 포션", 50, ConsumableItem.OptionType.Health, 30, 3);
         public ConsumableItem ManaPotion = new ConsumableItem("마나포션", "마나를 회복하는 포션", 100, ConsumableItem.OptionType.Mana, 30, 3);
@@ -55,7 +56,7 @@ namespace TextRpg
             return ManaPotion.Use(this);
         }
 
-        //레벨업시 변화
+        // 레벨업시 변화
         public void LevelUp()
         {
             while (exp >= maxExp)
@@ -63,12 +64,11 @@ namespace TextRpg
                 level++;
                 exp -= maxExp;
 
-                //레벨 2 -> 3 부터 경험치 필요량이 35 그다음은 65 이렇게 등차수열 로직 구현
-                //25 + (level -2) * 5 증가량 로직 생성
+                // 필요 경험치 증가량 로직 생성
                 int increase = 25 + (level - 2) * 5;
                 maxExp += increase;
 
-                //레벨업시 공격력 0.5증가 방어력 1증가
+                // 레벨업시 공격력 0.5증가 방어력 1증가
                 basePower += 0.5f;
                 baseDefense += 1;
             }
@@ -146,35 +146,43 @@ namespace TextRpg
                     {
                         case 1:
                             playerClass = "전사";
-                            hp = 100;
+                            hp = 150;
+                            maxHp = 150;
                             basePower = 8f;
                             baseDefense = 6;
                             agility = 0;
-                            mana = 50;
+                            mana = 80;
+                            maxMp = 80;
                             break;
                         case 2:
                             playerClass = "도적";
                             hp = 100;
+                            maxHp = 100;
                             basePower = 4f;
                             baseDefense = 5;
                             agility = 20;
-                            mana = 50;
+                            mana = 100;
+                            maxMp = 100;
                             break;
                         case 3:
                             playerClass = "궁수";
                             hp = 100;
+                            maxHp = 100;
                             basePower = 6f;
                             baseDefense = 5;
                             agility = 10;
-                            mana = 50;
+                            mana = 100;
+                            maxMp = 100;
                             break;
                         case 4:
                             playerClass = "마법사";
-                            hp = 100;
+                            hp = 80;
+                            maxHp = 85;
                             basePower = 7f;
                             baseDefense = 4;
                             agility = 0;
-                            mana = 80;
+                            mana = 150;
+                            maxMp = 150;
                             break;
                         default:
                             Console.Clear();
@@ -214,8 +222,8 @@ namespace TextRpg
                 $"직업: {playerClass}\n" +
                 $"레벨: {level}\n" +
                 $"경험치: {exp}/{maxExp}\n" +
-                $"체력: {hp}\n" +
-                $"마력: {mana}\n" +
+                $"체력: {hp}/{maxHp}\n" +
+                $"마력: {mana}/{maxMp}\n" +
                 $"공격력: {totalPower}\n" +
                 $"방어력: {totalDefense}\n" +
                 $"민첩: {agility}\n" +

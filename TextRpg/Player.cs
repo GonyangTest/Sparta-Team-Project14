@@ -14,9 +14,9 @@ namespace TextRpg
         public int exp = 0; // 경험치
         public int gold = 10000; // 골드
         public int hp = 0; // 체력
-        public int power = 0; // 공격력
+        public float power = 0.0f; // 공격력
         public int defense = 0; // 방어력
-        public int basePower = 0;
+        public float basePower = 0.0f;
         public int baseDefense = 0;
         //추가스텟
         public int mana = 0;
@@ -57,6 +57,25 @@ namespace TextRpg
             return ManaPotion.Use(this);
         }
 
+        //레벨업시 변화
+        public void LevelUp()
+        {
+            while (exp >= maxExp)
+            {
+                level++;
+                exp -= maxExp;
+
+                //레벨 2 -> 3 부터 경험치 필요량이 35 그다음은 65 이렇게 등차수열 로직 구현
+                //25 + (level -2) * 5 증가량 로직 생성
+                int increase = 25 + (level - 2) * 5;
+                maxExp += increase;
+
+                //레벨업시 공격력 0.5증가 방어력 1증가
+                basePower += 0.5f;
+                baseDefense += 1;
+            }
+
+        }
 
         public void SetPlayer()
         {
@@ -130,7 +149,7 @@ namespace TextRpg
                         case 1:
                             playerClass = "전사";
                             hp = 100;
-                            basePower = 8;
+                            basePower = 8f;
                             baseDefense = 6;
                             agility = 0;
                             mana = 50;
@@ -139,7 +158,7 @@ namespace TextRpg
                         case 2:
                             playerClass = "도적";
                             hp = 100;
-                            basePower = 4;
+                            basePower = 4f;
                             baseDefense = 5;
                             agility = 20;
                             mana = 50;
@@ -148,7 +167,7 @@ namespace TextRpg
                         case 3:
                             playerClass = "궁수";
                             hp = 100;
-                            basePower = 6;
+                            basePower = 6f;
                             baseDefense = 5;
                             agility = 10;
                             mana = 50;
@@ -157,7 +176,7 @@ namespace TextRpg
                         case 4:
                             playerClass = "마법사";
                             hp = 100;
-                            basePower = 7;
+                            basePower = 7f;
                             baseDefense = 4;
                             agility = 0;
                             mana = 80;
@@ -173,7 +192,7 @@ namespace TextRpg
                 }
             }
         }
-        public int totalPower
+        public float totalPower
         {
             get
             {

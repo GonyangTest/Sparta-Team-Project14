@@ -14,12 +14,18 @@ namespace TextRpg
         public int exp = 0; // 경험치
         public int gold = 10000; // 골드
         public int hp = 0; // 체력
+        public int mana = 0; // 마나
         public int power = 0; // 공격력
         public int defense = 0; // 방어력
+        public int maxHp = 100; // 최대 체력
+        public int maxMp = 100; // 최대 마나
+
         public int basePower = 0;
         public int baseDefense = 0;
         public Item EquippedWeapon;
         public Item EquippedArmor;
+        public ConsumableItem HealthPotion = new ConsumableItem("체력포션", "체력을 회복하는 포션", 50, ConsumableItem.OptionType.Health, 30, 3);
+        public ConsumableItem ManaPotion = new ConsumableItem("마나포션", "마나를 회복하는 포션", 100, ConsumableItem.OptionType.Mana, 30, 3);
 
         public void SetPlayer()
         {
@@ -108,7 +114,7 @@ namespace TextRpg
                             continue;
                     }
                     break;
-                }
+                } 
             }
         }
         public int totalPower
@@ -175,5 +181,28 @@ namespace TextRpg
         }
 
 
+        // 체력 포션 사용
+        public bool UseHealthPotion()
+        {
+            if (hp >= maxHp)
+            {
+                Console.WriteLine("\n이미 최대체력입니다.");
+                return false;
+            }
+            
+            return HealthPotion.Use(this);
+        }
+
+        // 마나 포션 사용
+        public bool UseManaPotion()
+        {
+            if (mana >= maxMp)
+            {
+                Console.WriteLine("\n이미 최대마나입니다.");
+                return false;
+            }
+            
+            return ManaPotion.Use(this);
+        }
     }
 }

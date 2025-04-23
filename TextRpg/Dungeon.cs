@@ -248,7 +248,10 @@ namespace TextRpg
                     // 공격 처리
                     Console.Clear();
                     Console.WriteLine("Battle!!\n");
-                    int damage = Math.Max(0, player.totalPower - target.Defense);
+                    //int damage = (int)(player.totalPower * (100f / (100 + target.Defense)));
+                    //damage = Math.Max(3, damage); //-> 데미지가 너무약하면 아래 코드 주석처리하고 이코드 풀어서 사용하세요
+
+                    int damage = Math.Max(1, (int)(player.totalPower - target.Defense));
                     target.CurrentHP -= damage;
 
                     Console.WriteLine($"{player.playerName} 의 공격!");

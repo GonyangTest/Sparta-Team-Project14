@@ -170,7 +170,7 @@ namespace TextRpg
         {
             if (!monstersLoaded)
             {
-                string filePath = @"C:\Users\USER\OneDrive\바탕 화면\testDeongeon\Sparta-Team-Project14-main\TextRpg\monsters.csv";
+                string filePath = @"..\..\..\monsters.csv";
                 //상대경로 수정필요
                 MonsterFactory.LoadMonsters(filePath);
                 monstersLoaded = true;

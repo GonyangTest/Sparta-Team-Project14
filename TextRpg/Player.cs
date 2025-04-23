@@ -202,7 +202,12 @@ namespace TextRpg
             return ManaPotion.Use(this);
         }
 
-
+        public void AddExp(int expAmount)
+        {
+            exp += expAmount; // 매개변수만큼 경험치를 더하고
+            LevelUp(); // 레벨업 체크
+            Program.quest.QuestRenewal(2, level); // 레벨 달성 퀘스트 판정
+        }
 
         // 레벨업시 변화
         public void LevelUp()

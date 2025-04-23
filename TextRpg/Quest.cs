@@ -36,17 +36,14 @@ namespace TextRpg
     // 발제 자료에 있는 것으로만 제작
 
 
-    // 3. 부터는 내일 코드 마저 작성
-
     // 3. 어디서 달성 보상을 받는지?
     // 1) 퀘스트를 주는 NPC에게 가거나,
     // 2) 업적 창에서 달성 버튼을 누르거나(화면 전환 때 달성한 업적 버튼 달성 활성화)
     // 3) 달성 즉시
     // 크게 2가지 종류
     // (1) 특정 트리거를 통해 달성 보상을 받게끔
-    // (2) 완료 즉시 달성 보상이 뜨게끔
-    // 흚... 데이터를 쌓다가 달성하면 즉시 뜨게끔 하는 게 좋지 않을까?
-    // 데이터는 어디서 쌓을까?
+    // (2) 완료 즉시 달성 보상이 뜨게끔 >> 이걸로 하겠습니다.
+    // 데이터는 어디서 쌓을까? >> 각 데이터가 변하는 위치에서 메서드 하나로 처리
 
     // 4. 데이터 저장(나중에 만들 예정)
     // 각 퀘스트에 대해 딕셔너리 하나로 처리하는 방법을 검토
@@ -55,12 +52,6 @@ namespace TextRpg
     // >> 완료한 퀘스트는 key를 제외 >> 없는 key는 이미 완료한 퀘스트!
     // >> 퀘스트를 완료할수록 체크할 양과 저장 데이터가 줄어들어서 점점 좋아지는 구조
 
-    // 다만, 라이브 서비스의 경우 추가 업적을 만들 때 유저 모든 데이터에 추가 퀘스트들에 대해 인덱스, count값 페어를 넣어줘야 함
-    // 싱글 게임 dlc의 경우는 그냥 실행하는 각 플레이어 데이터에 대해 처리해주면 되기에 큰 문제가 없음..
-    // 어??? 생각해보니 라이브 서비스 게임도 이러면 되긴 하겠네
-    // 대신 퀘스트 클리어 여부를 키 보유 여부로만 따지면 안되고
-    // 적어도 각 퀘스트 완료 여부를 나타내는 비트들의 모음 정도는 있어야 할 듯 >> 정보 처리 속도도 빠르고 확실한 지표가 될 수 있음
-
     public class Quest
     {
         List<QuestForm> quests = new List<QuestForm>() { };
@@ -68,37 +59,42 @@ namespace TextRpg
         // 저장/불러오기용 퀘스트 데이터(json에 필요하면 public으로 변경해도 괜찮습니다)
         Dictionary<int, int> questData = new Dictionary<int, int>();
 
+        public Dictionary<int, int> Get_questData() { return questData; }
+
         public Quest() // 퀘스트 초기화
         {
             QuestForm questTmp = new QuestForm();// 임시 퀘스트폼
             int index = 0;
 
-            ReSetForm(ref questTmp, ref index); // 임시 퀘스트폼 공통 부분 초기화
             questTmp.title = "마을을 위협하는 몬스터 처치";
             questTmp.info = "이봐! 마을 근처에 몬스터들이 너무 많아졌다고 생각하지 않나?\n" +
                             "마을주민들의 안전을 위해서라도 저것들 수를 좀 줄여야 한다고!\n" +
                             "모험가인 자네가 좀 처치해주게!\n";
             questTmp.goalInfo = " - 몬스터 5마리 처치 ({0}/{1})\n";
             questTmp.goal = 5;
+            questTmp.isOverrideCount = false;
             questTmp.rewards.exp = 0;
             questTmp.rewards.gold = 5;
             // 퀘스트 클리어 후 아이템 지급 테스트 용도로 임의로 상점에 팔지 않는 아이템 하나 생성
             questTmp.rewards.items = new RewardItem[] { new RewardItem(new Armor("초심자 갑옷", 1, "최소한의 보호 장비", 50, false), 1) };
+            ResetForm(ref questTmp, ref index); // 임시 퀘스트폼 공통 부분 초기화
             quests.Add(questTmp); // 리스트는 값을 참조 >> 추가할 때 questTmp의 값을 복사하여 새로운 원소로 만듦
 
-            ReSetForm(ref questTmp, ref index);
+
             questTmp.title = "장비를 장착해보자";
             questTmp.info = "훌륭한 모험가는 좋은 장비를 착용하는 법이지\n" +
                             "맨손으로 몬스터에게 맞선다고? 자네 제정신인가?\n" +
                             "아무 장비라도 하나 걸쳐보게\n";
             questTmp.goalInfo = " - 장비 착용해보기 ({0}/{1})\n";
             questTmp.goal = 1;
+            questTmp.isOverrideCount = true;
             questTmp.rewards.exp = 10;
             questTmp.rewards.gold = 0;
             questTmp.rewards.items = null;
+            ResetForm(ref questTmp, ref index);
             quests.Add(questTmp);
 
-            ReSetForm(ref questTmp, ref index);
+
             questTmp.title = "더욱 더 강해지기";
             questTmp.info = "모험가 협회에서는 모험가들에게 지원을 하고 있다네\n" +
                             "일정 수준 이상의 모험가들은 협회에도 귀한 자원이니 말일세\n" +
@@ -106,21 +102,45 @@ namespace TextRpg
             questTmp.goalInfo = " - 레벨 달성 ({0}/{1})\n";
             questTmp.goal = 5;
             questTmp.rewards.exp = 0;
+            questTmp.isOverrideCount = true;
             questTmp.rewards.gold = 1000;
             questTmp.rewards.items = null;
+            ResetForm(ref questTmp, ref index);
             quests.Add(questTmp);
         }
 
-        void ReSetForm(ref QuestForm tmpForm, ref int index)
+        void ResetForm(ref QuestForm tmpForm, ref int index)
         {
             // !!!!! 저장 데이터가 있다면
             // index 번째의 퀘스트가 달성 >> tmpForm.isAccomplish = true; tmpForm.count = (데이터 값); 을 받기(당장 쓰지 않더라도 나중에 확장하면 쌓인 데이터로 바로 퀘스트 클리어 가능하게끔 할 수 있음. 계속 플레이한 유저들에게 효용감을 줄 수 있음)
             // 달성하지 못했다면 tmpForm.isAccomplish = false; tmpForm.count = (데이터 값); 을 받기
-
-            // 저장 데이터가 없다면
+            //if (저장 데이터가 있다면)
+            //{
+            //    // 해당 퀘스트 번호를 키로 가지고 있다면
+            //    if (questData.ContainsKey(index))
+            //    {
+            //        // 해당 퀘스트 미완
+            //        tmpForm.isAccomplish = false;
+            //        // 퀘스트 달성도 값 불러오기
+            //        questData.TryGetValue(index, out tmpForm.count);
+            //    }
+            //    // 해당 퀘스트 번호가 없다면
+            //    else
+            //    {
+            //        // 해당 퀘스트 완료
+            //        tmpForm.isAccomplish = true;
+            //        // 목표값으로 덮어쓰기
+            //        tmpForm.count = tmpForm.goal;
+            //    }
+            //}
+            // 저장데이터가 없다면
+            //else
+            //{
             // 생성 초기에 공통적으로 달성하지 않은 상태
             tmpForm.isAccomplish = false;
-            tmpForm.count = 0;
+                tmpForm.count = 0;
+                questData.Add(index, 0); // 해당 퀘스트 달성도 0으로 집어넣기
+            //}
 
             // 다음 저장 데이터로
             index += 1;
@@ -222,13 +242,12 @@ namespace TextRpg
         }
 
         // 퀘스트 달성도 경신 후 달성 여부 체크
-        // !!!!! 합친 이후에 구조 보고 각 작업자님께 말하고 추가할 것
-        // 0: 전투 결과 때 몬스터 출현 수를 더하기
-        // 1: 장비 장착할 때 +1
-        // 2: 플레이어 레벨업 메서들 호출 때마다 +1
-        public void QuestRenewal(int index, int _count)
+        // 0: 전투 결과 때 몬스터 출현 수를 더하기 >> 던전 마스터님의 작업이 끝나면 결과창에 추가하기!!!!!
+        // 1: 장비 장착할 때 1
+        // 2: 플레이어 레벨업 메서들 호출 때마다
+        public void QuestRenewal(int questIndex, int countChanged)
         {
-            quests[index].CheckAccomlish(_count);
+            quests[questIndex].CheckAccomlish(questIndex, countChanged);
         }
 
         // 다른 글자색을 표현하기 위한 메서드들
@@ -257,20 +276,29 @@ namespace TextRpg
             count, // 달성도
             goal; // 목표치
 
-        public bool isAccomplish; // 퀘스트 달성 여부
+        public bool
+            isAccomplish, // 퀘스트 달성 여부
+            isOverrideCount; // 카운트 방식(true: 값 덮어쓰기, false: 값 축적) // 어떤 구조일지 모르는 부분들이 있어 변수 하나로 대처하기 위함
 
         public Rewards rewards; // 보상
 
         // 달성량 추가 후 퀘스트 달성 여부 체크 >> 각 필요한 화면에서 불러오기
-        public void CheckAccomlish(int addCount)
+        public void CheckAccomlish(int questIndex, int addCount)
         { 
             if (isAccomplish) // 이미 달성한 퀘스트라면 메서드를 종료
                 return;
 
-            count += addCount; // 카운트 증가
-            if(count >= goal) // 달성하지 않은 퀘스트의 목표를 달성했을 때 
+            // 카운트 방식에 따른 경신
+            if (isOverrideCount)
+                count = addCount; 
+            else
+                count += addCount;
+
+            // 달성하지 않은 퀘스트의 목표를 달성했을 때 
+            if (count >= goal) 
             {  
                 isAccomplish = true; // 달성 상태 기록
+                Program.quest.Get_questData().Remove(questIndex); // 달성한 퀘스트는 데이터 딕셔너리에서 제거
                 Reward(); // 보상 지급
                 AlarmAccomplish(); // 보상 지급창 팝업
             }
@@ -280,8 +308,7 @@ namespace TextRpg
         public void Reward()
         {
             Program.player.gold += rewards.gold;    // 골드
-            Program.player.exp += rewards.exp;      // 경험치
-            // 경험치 올라갔을 때 레벨업이 되는지 체크 >> 만들어진 로직에 잇기 !!!!!
+            Program.player.AddExp(rewards.exp);      // 경험치
 
             // 아이템
             if (rewards.items != null)  // 보상 아이템이 있다면

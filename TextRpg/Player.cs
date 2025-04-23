@@ -263,7 +263,7 @@ namespace TextRpg
                 $"민첩: {agility}\n" +
                 $"장착 무기: {(EquippedWeapon != null ? EquippedWeapon.itemName : "없음")}\n" +
                 $"장착 방어구: {(EquippedArmor != null ? EquippedArmor.itemName : "없음")}\n" +
-                $"골드 : {gold}G\n";
+                $"골드 : {gold} G\n";
                 Console.WriteLine("0. 나가기\n");
                 Console.WriteLine("원하시는 행동을 입력해주세요.");
                 string current = Console.ReadLine();

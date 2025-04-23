@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Emit;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace TextRpg
 {
+
     public class Job
     {
         public string Name;
@@ -39,6 +41,34 @@ namespace TextRpg
         };
     }
 
+    public class Skill
+    {
+        public string Job;
+        public string Name;
+        public float PowerMultiplier;
+        public int ManaCost;
+
+        public Skill(string job, string name, float powerMultiplier, int manaCost)
+        {
+            Job = job;
+            Name = name;
+            PowerMultiplier = powerMultiplier;
+            ManaCost = manaCost;
+        }
+
+        public static Dictionary<int, Skill> SkillList = new Dictionary<int, Skill>()
+        {
+            {1, new Skill("전사", "강타", 2f, 10) },
+            {2, new Skill("전사", "대지의분노", 1.5f, 20) },
+            {3, new Skill("도적", "기습", 2f, 10) },
+            {4, new Skill("도적", "그림자 춤", 1.5f, 20) },
+            {5, new Skill("궁수", "더블샷", 2f, 10) },
+            {6, new Skill("궁수", "화살비", 1.5f, 20) },
+            {7, new Skill("마법사", "파이어볼", 2f, 10) },
+            {8, new Skill("마법사", "메테오", 1.5f, 20) }
+        };
+    }
+
     class Player
     {
         public string playerName;
@@ -63,7 +93,7 @@ namespace TextRpg
         public Item EquippedArmor;
 
         // 체력 포션 사용
-        
+
 
         public void SetPlayer()
         {
@@ -145,7 +175,7 @@ namespace TextRpg
                 agility = SelectedJob.Agility;
 
                 break;
-                
+
             }
         }
 
@@ -209,6 +239,12 @@ namespace TextRpg
                 return defense + armorBonus;
             }
         }
+
+        public float SkillPower(Skill skill)
+        {
+            return totalPower * skill.PowerMultiplier;
+        }
+
         public string CurrentPlayer()
         {
             while (true)

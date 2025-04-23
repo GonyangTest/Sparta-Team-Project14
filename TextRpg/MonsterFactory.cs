@@ -32,16 +32,17 @@ namespace TextRpg
 
                 // 몬스터 객체 생성 및 CSV에서 값 파싱
                 var monster = new Monster
+                (
+                    stage: tokens[0],
+                    name: tokens[1],
+                    level: int.Parse(tokens[2]),
+                    maxHP: int.Parse(tokens[3]),
+                    attack: int.Parse(tokens[4]),
+                    defense: int.Parse(tokens[5]),
+                    dropExp: int.Parse(tokens[6]),
+                    dropGold: int.Parse(tokens[7])
+                )
                 {
-                    Stage = tokens[0],                         // 스테이지(스테이지 별로 몬스터 별도 소환)
-                    Name = tokens[1],                         // 몬스터 이름
-                    Level = int.Parse(tokens[2]),             // 레벨
-                    MaxHP = int.Parse(tokens[3]),             // 최대 체력
-                    CurrentHP = int.Parse(tokens[3]),         // 시작 시 체력 = 최대 체력 = 현재 체력 초기화
-                    Attack = int.Parse(tokens[4]),            // 공격력
-                    Defense = int.Parse(tokens[5]),           // 방어력
-                    DropExp = int.Parse(tokens[6]),
-                    DropGold = int.Parse(tokens[7])
                 };
 
                 // 타입을 키로 해서 몬스터 템플릿 저장 (덮어쓰기 가능)
@@ -54,41 +55,25 @@ namespace TextRpg
         {
             if (_monsterTemplates.TryGetValue(type, out var template))
             {
-                // 새로운 Monster 인스턴스를 복사하여 반환
-                return new Monster
+                // 새로운 Monster 인스턴스를 생성자를 활용하여 생성
+                var monster = new Monster(
+                    stage: template.Stage,
+                    name: template.Name,
+                    level: template.Level,
+                    maxHP: template.MaxHP,
+                    attack: template.Attack,
+                    defense: template.Defense,
+                    dropExp: template.DropExp,
+                    dropGold: template.DropGold
+                )
                 {
-                    Stage = template.Stage,
-                    Name = template.Name,
-                    MaxHP = template.MaxHP,
-                    CurrentHP = template.MaxHP,  // 새 몬스터는 항상 체력이 가득참
-                    Attack = template.Attack,
-                    Defense = template.Defense,
-                    Level = template.Level
                 };
+                
+                return monster;
             }
 
             // 존재하지 않는 타입 요청 시 예외 발생
             throw new ArgumentException($"'{type}' 몬스터는 존재하지 않습니다.");
         }
     }
-    ////**몬스터 생성 (던전 입장후 몬스터를 생성하면 됨**
-    //string filePath = @"E:\GitHub\Sparta-Team-Project14\TextRpg\monsters.csv";  // 경로 수정해야함!
-    //MonsterFactory.LoadMonsters(filePath); 
-
-    //try
-    //{
-    //    // 몬스터 생성 테스트
-    //    var Normal = MonsterFactory.Create("Normal");
-    //    var Eliite = MonsterFactory.Create("Eliite");
-    //    var Boss = MonsterFactory.Create("Boss");
-
-    //    Console.WriteLine(Normal);
-    //    Console.WriteLine(Eliite);
-    //    Console.WriteLine(Boss);
-    //}
-    //catch (Exception ex)
-    //{
-    //    Console.WriteLine("에러 발생: " + ex.Message);
-    //}
-    //Console.ReadLine();
 }

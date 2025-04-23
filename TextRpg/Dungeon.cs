@@ -177,7 +177,7 @@ namespace TextRpg
                 for (int i = 0; i < monsters.Count; i++)
                 {
                     var m = monsters[i];
-                    string status = m.CurrentHP <= 0 ? "Dead" : $"HP {m.CurrentHP}";
+                    string status = m.IsAlive ? $"HP {m.CurrentHP}" : "Dead";
                     Console.WriteLine($"{i + 1}. Lv.{m.Level} {m.Name}  {status}");
                 }
 
@@ -195,7 +195,7 @@ namespace TextRpg
                 {
                     var target = monsters[index - 1];
 
-                    if (target.CurrentHP <= 0)
+                    if (!target.IsAlive)
                     {
                         Console.WriteLine("이미 죽은 몬스터입니다.");
                         Console.ReadKey();
@@ -219,7 +219,7 @@ namespace TextRpg
                     {
                         bool isCritical = crit <= 15;
                         int finalDamage = isCritical ? (int)(damage * 1.6) : damage;
-                        target.CurrentHP -= finalDamage;
+                        target.Hit(finalDamage);
 
                         Console.WriteLine($"{player.playerName} 의 공격!");
                         Console.WriteLine(isCritical ? $"Lv.{target.Level} {target.Name} 을(를) 맞혔습니다. [데미지 : {finalDamage}] - 치명타 공격!!"
@@ -228,7 +228,7 @@ namespace TextRpg
 
                     
 
-                    if (target.CurrentHP <= 0)
+                    if (!target.IsAlive)
                         Console.WriteLine($"\nLv.{target.Level} {target.Name}\nHP {target.MaxHP} -> Dead");
                     else
                         Console.WriteLine($"\nLv.{target.Level} {target.Name}\nHP {target.CurrentHP}");
@@ -239,7 +239,7 @@ namespace TextRpg
                     // 살아있는 몬스터들의 반격
                     foreach (var m in monsters)
                     {
-                        if (m.CurrentHP > 0)
+                        if (m.IsAlive)
                         {
                             Console.Clear();
                             Console.WriteLine("Battle!!\n");

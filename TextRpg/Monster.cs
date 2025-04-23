@@ -8,19 +8,83 @@ namespace TextRpg
 {
     public class Monster
     { // 몬스터의 기본 스텟 받아오기
-        public string Stage { get; set; }
-        public string Name { get; set; }
-        public int Level { get; set; }
-        public int MaxHP { get; set; }
-        public int CurrentHP { get; set; }
-        public int Attack { get; set; }
-        public int Defense { get; set; }
-        public int DropExp { get; set; }
-        public int DropGold { get; set; }
+        private string _stage;
+        private string _name;
+        private int _level;
+        private int _maxHP;
+        private int _currentHP;
+        private int _attack;
+        private int _defense;
+        private int _dropExp;
+        private int _dropGold;
+
+        public string Stage { 
+            get => _stage; 
+        }
+        
+        public string Name { 
+            get => _name; 
+        }
+        
+        public int Level { 
+            get => _level; 
+        }
+        
+        public int MaxHP { 
+            get => _maxHP; 
+        }
+        
+        public int CurrentHP { 
+            get => _currentHP; 
+            set => _currentHP = Math.Max(0, Math.Min(value, _maxHP));
+        }
+        
+        public int Attack { 
+            get => _attack; 
+        }
+        
+        public int Defense { 
+            get => _defense; 
+        }
+        
+        public int DropExp { 
+            get => _dropExp; 
+        }
+        
+        public int DropGold { 
+            get => _dropGold; 
+        }
+        
+        public bool IsAlive => _currentHP > 0;
+
+        // 생성자 추가
+        public Monster()
+        {
+            // 기본 생성자
+        }
+
+        // 편의를 위한 매개변수 있는 생성자
+        public Monster(string stage, string name, int level, int maxHP, int attack, int defense, int dropExp, int dropGold)
+        {
+            _stage = stage;
+            _name = name;
+            _level = level;
+            _maxHP = Math.Max(1, maxHP);
+            _attack = Math.Max(0, attack);
+            _defense = Math.Max(0, defense);
+            _dropExp = Math.Max(0, dropExp);
+            _dropGold = Math.Max(0, dropGold);
+            _currentHP = _maxHP;
+        }
 
         public override string ToString()
         { // 몬스터가 생성되었을때 나오는 UI
             return $"Lv.{Level} {Name} HP: {CurrentHP}/{MaxHP}";
+        }
+
+        public void Hit(int damage)
+        {
+            _currentHP = Math.Max(0, _currentHP - damage);
         }
     }
 }

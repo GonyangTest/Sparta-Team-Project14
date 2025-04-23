@@ -134,7 +134,10 @@ namespace TextRpg
             for (int i = 0; i < quests.Count; i++)
             {
                 Write_Color($"{i + 1}. ", ConsoleColor.Red); // 퀘스트 순번(+해당 번호 입력 시 내용 확인 가능하다고 알림)
-                Console.WriteLine(quests[i].title); // 퀘스트 요약 타이틀 표시
+                Console.Write(quests[i].title); // 퀘스트 요약 타이틀 표시
+                if (quests[i].isAccomplish) // 퀘스트 달성 여부 표시
+                    Write_Color(" (달성)", ConsoleColor.Red);
+                Console.WriteLine();
             }
             Console.WriteLine();
             Console.Write("0. 나가기\n\n원하시는 퀘스트를 선택해주세요 >> ");
@@ -183,7 +186,10 @@ namespace TextRpg
             index -= 1; // 퀘스트 항목 선택은 1부터 시작. 그러나 퀘스트 데이터는 0부터 시작하기에 차이 1만큼 빼주기
             Console.Clear();
             WriteLine_Color("Quest!!\n", ConsoleColor.Yellow);
-            Console.WriteLine(quests[index].title); // 퀘스트 요약 타이틀
+            Console.Write(quests[index].title); // 퀘스트 요약 타이틀
+            if(quests[index].isAccomplish)
+                Write_Color(" (달성)", ConsoleColor.Red);
+            Console.WriteLine("\n");
             Console.WriteLine(quests[index].info); // 퀘스트 설명
             Console.WriteLine(quests[index].goalInfo, quests[index].count, quests[index].goal); // 목표 설명                                                                
             quests[index].PrintRewards(); // 보상 설명

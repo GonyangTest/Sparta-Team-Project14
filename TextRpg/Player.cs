@@ -185,7 +185,7 @@ namespace TextRpg
 
         public bool UseHealthPotion()
         {
-            if (SelectedJob.Hp >= SelectedJob.MaxHp)
+            if (hp >= maxHp)
             {
                 Console.WriteLine("\n이미 최대체력입니다.");
                 return false;
@@ -197,7 +197,7 @@ namespace TextRpg
         // 마나 포션 사용
         public bool UseManaPotion()
         {
-            if (SelectedJob.Mana >= SelectedJob.MaxMp)
+            if (mana >= maxMp)
             {
                 Console.WriteLine("\n이미 최대마나입니다.");
                 return false;

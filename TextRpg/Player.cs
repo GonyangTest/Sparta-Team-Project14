@@ -202,6 +202,11 @@ namespace TextRpg
             return ManaPotion.Use(this);
         }
 
+        public void Hit(int hp_decrease)
+        {
+            hp = Math.Clamp(hp - hp_decrease, 0, maxHp);
+        }
+
         public void AddExp(int expAmount)
         {
             exp += expAmount; // 매개변수만큼 경험치를 더하고
@@ -250,10 +255,8 @@ namespace TextRpg
             return totalPower * skill.PowerMultiplier;
         }
 
-        public string CurrentPlayer()
+        public string PrintPlayer()
         {
-            while (true)
-            {
                 Console.WriteLine("상태보기\n");
                 Console.WriteLine("캐릭터의 정보가 표시됩니다.\n");
                 return $"[플레이어 정보]\n" +
@@ -269,31 +272,30 @@ namespace TextRpg
                 $"장착 무기: {(EquippedWeapon != null ? EquippedWeapon.itemName : "없음")}\n" +
                 $"장착 방어구: {(EquippedArmor != null ? EquippedArmor.itemName : "없음")}\n" +
                 $"골드 : {gold} G\n";
-                Console.WriteLine("0. 나가기\n");
-                Console.WriteLine("원하시는 행동을 입력해주세요.");
-                string current = Console.ReadLine();
-                int currentSelect;
-                if (!int.TryParse(current, out currentSelect))
-                {
-                    Console.Clear();
-                    Console.WriteLine("목록에 나온 숫자만 입력하세요.");
-                    Console.ReadKey();
-                }
-                else
-                {
-                    switch (currentSelect)
-                    {
-                        case 0:
-                            break;
-                        default:
-                            Console.Clear();
-                            Console.WriteLine("목록에 나온 숫자만 입력하세요.");
-                            Console.ReadKey();
-                            continue;
-                    }
-                }
-                break;
-            }
+                //Console.WriteLine("0. 나가기\n");
+                //Console.WriteLine("원하시는 행동을 입력해주세요.");
+                //string current = Console.ReadLine();
+                //int currentSelect;
+                //if (!int.TryParse(current, out currentSelect))
+                //{
+                //    Console.Clear();
+                //    Console.WriteLine("목록에 나온 숫자만 입력하세요.");
+                //    Console.ReadKey();
+                //}
+                //else
+                //{
+                //    switch (currentSelect)
+                //    {
+                //        case 0:
+                //            break;
+                //        default:
+                //            Console.Clear();
+                //            Console.WriteLine("목록에 나온 숫자만 입력하세요.");
+                //            Console.ReadKey();
+                //            continue;
+                //    }
+                //}
+                //break;
         }
     }
 }

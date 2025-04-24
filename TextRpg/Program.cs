@@ -1,5 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 using TextRpg;
+using System.Text;
 
 internal class Program
 {
@@ -8,6 +9,9 @@ internal class Program
     internal static Quest quest = new Quest();
     static void Main(string[] args)
     {
+        Console.OutputEncoding = Encoding.UTF8;
+        Console.SetWindowSize(150, 60);
+
         Town town = new Town();
         Shop shop = new Shop(player);
         Dungeon dungeon = new Dungeon();

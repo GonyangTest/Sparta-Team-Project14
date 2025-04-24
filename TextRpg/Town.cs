@@ -38,7 +38,7 @@ namespace TextRpg
                             break;
                         case 1:
                             Console.Clear();
-                            Console.WriteLine(player.CurrentPlayer());
+                            Console.WriteLine(player.PrintPlayer());
                             Console.WriteLine("\n0. 나가기");
                             Console.ReadLine();
                             break;

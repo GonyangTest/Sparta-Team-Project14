@@ -5,7 +5,7 @@ using System.Reflection.Emit;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
-
+using Spectre.Console;
 namespace TextRpg
 {
 
@@ -100,87 +100,74 @@ namespace TextRpg
 
         public void SetPlayer()
         {
+            Console.Clear();
+            AnsiConsole.MarkupLine("스파르타 던전에 오신 여러분 환영합니다.");
+            var userName = AnsiConsole.Prompt(
+                new TextPrompt<string>("[bold]원하시는 이름을 설정해주세요:[/]")
+                .PromptStyle("white")
+                .DefaultValue("[dim gray]예) 스파르타 전사[/]")
+                .AllowEmpty());
 
-            while (true)
+            playerName = userName;
+            List<string> userNameList = new List<string>()
             {
-                bool isSave = true;
-                Console.Clear();
-                Console.WriteLine("스파르타 던전에 오신 여러분 환영합니다.");
-                Console.WriteLine("원하시는 이름을 설정해주세요.");
-                string userName = Console.ReadLine();
-                playerName = userName;
+                "1. 저장",
+                "2. 취소"
+            };
 
-                while (true)
-                {
-                    Console.Clear();
-                    Console.WriteLine($"입력하신 이름은 {playerName}입니다.\n");
-                    Console.WriteLine("1.저장\n2.취소\n");
-                    Console.WriteLine("원하시는 행동을 입력해주세요.");
-                    string userNameSelect = Console.ReadLine();
 
-                    int userNameTmp;
-                    if (!int.TryParse(userNameSelect, out userNameTmp))
-                    {
-                        Console.Clear();
-                        Console.WriteLine("목록에 나온 숫자만 입력하세요.");
-                        Console.ReadKey();
-                    }
-                    else
-                    {
-                        switch (userNameTmp)
-                        {
-                            case 1:
-                                playerName = userName;
-                                break;
-                            case 2:
-                                Console.Clear();
-                                isSave = false;
-                                break;
-                            default:
-                                Console.Clear();
-                                Console.WriteLine("목록에 나온 숫자만 입력하세요.");
-                                Console.ReadKey();
-                                continue;
-                        }
-                    }
-                    break;
-                }
-                if (isSave)
-                {
-                    break;
-                }
-            }
-            while (true)
+
+            Console.Clear();
+            AnsiConsole.MarkupLine($"입력하신 이름은 [bold]'{playerName}'[/]입니다.\n");
+            var choice = AnsiConsole.Prompt(
+                new SelectionPrompt<string>()
+                    .Title("원하시는 행동을 선택해주세요.")
+                    .PageSize(10)
+                    .AddChoices(userNameList));
+
+            int index = int.Parse(choice.Split('.')[0]);
+
+
+            switch (index)
             {
-                Console.Clear();
-                Console.WriteLine("스파르타 던전에 오신 여러분 환영합니다.");
-                Console.WriteLine("원하시는 직업을 설정해주세요.\n");
-                Console.WriteLine("1.전사\n2.도적\n3.궁수\n4.마법사\n");
-                Console.WriteLine("원하시는 행동을 입력해주세요.");
-                string job = Console.ReadLine();
-
-                int selectJob;
-                if (!int.TryParse(job, out selectJob))
-                {
+                case 1:
+                    playerName = userName;
+                    break;
+                case 2:
                     Console.Clear();
-                    Console.WriteLine("목록에 나온 숫자만 입력하세요.");
-                    Console.ReadKey();
-                }
-
-                SelectedJob = Job.JobList[selectJob];
-                playerClass = SelectedJob.Name;
-                hp = SelectedJob.Hp;
-                mana = SelectedJob.Mana;
-                maxHp = SelectedJob.MaxHp;
-                maxMp = SelectedJob.MaxMp;
-                power = SelectedJob.Power;
-                defense = SelectedJob.Defense;
-                agility = SelectedJob.Agility;
-                criticalChance = SelectedJob.CriticalChance;
-
-                break;
-
+                    break;
             }
+
+            List<string> jobList = new List<string>()
+            {
+                "1. 전사",
+                "2. 도적",
+                "3. 궁수",
+                "4. 마법사"
+            };
+
+            Console.Clear();
+            Console.WriteLine("스파르타 던전에 오신 여러분 환영합니다.");
+            Console.WriteLine("원하시는 직업을 설정해주세요.\n");
+            
+            choice = AnsiConsole.Prompt(
+                new SelectionPrompt<string>()
+                    .Title("원하시는 직업을 선택해주세요.")
+                    .PageSize(10)
+                    .AddChoices(jobList));
+
+            index = int.Parse(choice.Split('.')[0]);
+
+            SelectedJob = Job.JobList[index];
+            playerClass = SelectedJob.Name;
+            hp = SelectedJob.Hp;
+            mana = SelectedJob.Mana;
+            maxHp = SelectedJob.MaxHp;
+            maxMp = SelectedJob.MaxMp;
+            power = SelectedJob.Power;
+            defense = SelectedJob.Defense;
+            agility = SelectedJob.Agility;
+            criticalChance = SelectedJob.CriticalChance;
         }
 
         public bool UseHealthPotion()
@@ -284,30 +271,6 @@ namespace TextRpg
                 $"장착 무기: {(EquippedWeapon != null ? EquippedWeapon.itemName : "없음")}\n" +
                 $"장착 방어구: {(EquippedArmor != null ? EquippedArmor.itemName : "없음")}\n" +
                 $"골드 : {gold} G\n";
-                //Console.WriteLine("0. 나가기\n");
-                //Console.WriteLine("원하시는 행동을 입력해주세요.");
-                //string current = Console.ReadLine();
-                //int currentSelect;
-                //if (!int.TryParse(current, out currentSelect))
-                //{
-                //    Console.Clear();
-                //    Console.WriteLine("목록에 나온 숫자만 입력하세요.");
-                //    Console.ReadKey();
-                //}
-                //else
-                //{
-                //    switch (currentSelect)
-                //    {
-                //        case 0:
-                //            break;
-                //        default:
-                //            Console.Clear();
-                //            Console.WriteLine("목록에 나온 숫자만 입력하세요.");
-                //            Console.ReadKey();
-                //            continue;
-                //    }
-                //}
-                //break;
         }
     }
 }

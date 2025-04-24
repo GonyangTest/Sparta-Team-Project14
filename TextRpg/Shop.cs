@@ -208,6 +208,12 @@ namespace TextRpg
                     _player.EquippedArmor = null;
                     Console.WriteLine($"{selectedItem.itemName}을(를) 해제했습니다. (방어구)");
                 }
+                
+                Item? item = items.Find(item => item.itemName == selectedItem.itemName);
+                if (item != null)
+                {
+                    item.isPurchased = false;
+                }
 
                 // 아이템 판매 처리
                 inventory.RemoveItem(selectedItem); // 아이템을 인벤토리에서 제거

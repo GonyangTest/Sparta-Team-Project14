@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection.Emit;
 
 namespace TextRpg
 {
@@ -121,9 +120,8 @@ namespace TextRpg
                     {
                         player.EquippedWeapon = selected;
                         Console.WriteLine($"{selected.itemName} 을(를) 장착했습니다! (무기)");
-                        Program.quest.QuestRenewal(1, 1); // 장비 장착 퀘스트 판정
                     }
-                    //player.CurrentPlayer(); // 능력치 갱신
+                    player.CurrentPlayer(); // 능력치 갱신
                 }
                 else if (selected is Armor)
                 {
@@ -136,9 +134,8 @@ namespace TextRpg
                     {
                         player.EquippedArmor = selected;
                         Console.WriteLine($"{selected.itemName} 을(를) 장착했습니다! (방어구)");
-                        Program.quest.QuestRenewal(1, 1); // 장비 장착 퀘스트 판정
                     }
-                    //player.CurrentPlayer(); // 능력치 갱신
+                    player.CurrentPlayer(); // 능력치 갱신
                 }
                 else
                 {

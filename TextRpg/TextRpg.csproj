@@ -7,8 +7,4 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Compile Remove="Player - 복사.cs" />
-  </ItemGroup>
-
 </Project>

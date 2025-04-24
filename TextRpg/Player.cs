@@ -19,8 +19,9 @@ namespace TextRpg
         public float Power;
         public int Defense;
         public int Agility;
+        public int CriticalChance;
 
-        public Job(string name, int hp, int mana, int maxHp, int maxMp, float power, int defense, int agility)
+        public Job(string name, int hp, int mana, int maxHp, int maxMp, float power, int defense, int agility, int criticalChance)
         {
             Name = name;
             Hp = hp;
@@ -30,14 +31,15 @@ namespace TextRpg
             Power = power;
             Defense = defense;
             Agility = agility;
+            CriticalChance = criticalChance;
         }
 
         public static Dictionary<int, Job> JobList = new Dictionary<int, Job>()
         {
-            {1, new Job("전사", 150, 80, 150, 80, 8f, 6, 0)},
-            {2, new Job("도적", 100, 100, 100, 100, 4f, 5, 0)},
-            {3, new Job("궁수", 100, 100, 100, 100, 6f, 5, 0)},
-            {4, new Job("마법사", 80, 150, 80, 150, 7f, 4, 0)}
+            {1, new Job("전사", 150, 80, 150, 80, 8f, 6, 0, 5)},
+            {2, new Job("도적", 100, 100, 100, 100, 4f, 5, 0, 20)},
+            {3, new Job("궁수", 100, 100, 100, 100, 6f, 5, 0, 10)},
+            {4, new Job("마법사", 80, 150, 80, 150, 7f, 4, 0, 10)}
         };
     }
 
@@ -84,6 +86,7 @@ namespace TextRpg
         public float power;
         public int defense;
         public int agility;
+        public int criticalChance;
         public Job SelectedJob;
 
         public ConsumableItem HealthPotion = new ConsumableItem("체력포션", "체력을 회복하는 포션", 50, ConsumableItem.OptionType.Health, 30, 3);
@@ -173,6 +176,7 @@ namespace TextRpg
                 power = SelectedJob.Power;
                 defense = SelectedJob.Defense;
                 agility = SelectedJob.Agility;
+                criticalChance = SelectedJob.CriticalChance;
 
                 break;
 
@@ -239,10 +243,17 @@ namespace TextRpg
                 return defense + armorBonus;
             }
         }
-
+        //스킬 데미지
         public float SkillPower(Skill skill)
         {
-            return totalPower * skill.PowerMultiplier;
+            int skillPower = (int)(totalPower * skill.PowerMultiplier);
+            return skillPower;
+        }
+        //크리티컬 데미지
+        public int CriticalDamage()
+        {
+            int criticalDamage = (int)(totalPower * 1.6);
+            return criticalDamage;
         }
 
         public string CurrentPlayer()
@@ -261,6 +272,7 @@ namespace TextRpg
                 $"공격력: {totalPower}\n" +
                 $"방어력: {totalDefense}\n" +
                 $"민첩: {agility}\n" +
+                $"치명타확률: {criticalChance}\n" +
                 $"장착 무기: {(EquippedWeapon != null ? EquippedWeapon.itemName : "없음")}\n" +
                 $"장착 방어구: {(EquippedArmor != null ? EquippedArmor.itemName : "없음")}\n" +
                 $"골드 : {gold} G\n";

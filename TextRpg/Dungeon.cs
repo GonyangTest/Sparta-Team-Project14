@@ -183,7 +183,7 @@ namespace TextRpg
 
                 Console.WriteLine("\n[내정보]");
                 Console.WriteLine($"Lv.{player.level} {player.playerName} ({player.playerClass})");
-                Console.WriteLine($"HP {player.hp}/100\n");
+                Console.WriteLine($"HP {player.hp}/{player.maxHp}\n");
 
                 Console.WriteLine("0. 취소\n");
                 Console.Write("대상을 선택해주세요.\n>> ");

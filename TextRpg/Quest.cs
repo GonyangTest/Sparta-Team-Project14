@@ -66,6 +66,7 @@ namespace TextRpg
             QuestForm questTmp = new QuestForm();// 임시 퀘스트폼
             int index = 0;
 
+            ResetForm(ref questTmp, ref index); // 임시 퀘스트폼 공통 부분 초기화
             questTmp.title = "마을을 위협하는 몬스터 처치";
             questTmp.info = "이봐! 마을 근처에 몬스터들이 너무 많아졌다고 생각하지 않나?\n" +
                             "마을주민들의 안전을 위해서라도 저것들 수를 좀 줄여야 한다고!\n" +
@@ -77,10 +78,9 @@ namespace TextRpg
             questTmp.rewards.gold = 5;
             // 퀘스트 클리어 후 아이템 지급 테스트 용도로 임의로 상점에 팔지 않는 아이템 하나 생성
             questTmp.rewards.items = new RewardItem[] { new RewardItem(new Armor("초심자 갑옷", 1, "최소한의 보호 장비", 50, false), 1) };
-            ResetForm(ref questTmp, ref index); // 임시 퀘스트폼 공통 부분 초기화
             quests.Add(questTmp); // 리스트는 값을 참조 >> 추가할 때 questTmp의 값을 복사하여 새로운 원소로 만듦
 
-
+            ResetForm(ref questTmp, ref index);
             questTmp.title = "장비를 장착해보자";
             questTmp.info = "훌륭한 모험가는 좋은 장비를 착용하는 법이지\n" +
                             "맨손으로 몬스터에게 맞선다고? 자네 제정신인가?\n" +
@@ -91,10 +91,9 @@ namespace TextRpg
             questTmp.rewards.exp = 10;
             questTmp.rewards.gold = 0;
             questTmp.rewards.items = null;
-            ResetForm(ref questTmp, ref index);
             quests.Add(questTmp);
 
-
+            ResetForm(ref questTmp, ref index);
             questTmp.title = "더욱 더 강해지기";
             questTmp.info = "모험가 협회에서는 모험가들에게 지원을 하고 있다네\n" +
                             "일정 수준 이상의 모험가들은 협회에도 귀한 자원이니 말일세\n" +
@@ -105,7 +104,6 @@ namespace TextRpg
             questTmp.isOverrideCount = true;
             questTmp.rewards.gold = 1000;
             questTmp.rewards.items = null;
-            ResetForm(ref questTmp, ref index);
             quests.Add(questTmp);
         }
 
@@ -137,6 +135,7 @@ namespace TextRpg
             //else
             //{
             // 생성 초기에 공통적으로 달성하지 않은 상태
+            tmpForm = new QuestForm();// 임시 퀘스트폼
             tmpForm.isAccomplish = false;
                 tmpForm.count = 0;
                 questData.Add(index, 0); // 해당 퀘스트 달성도 0으로 집어넣기
@@ -265,9 +264,9 @@ namespace TextRpg
         }
     }
 
-    struct QuestForm
+    class QuestForm
     {
-        public string
+        public string?
             title, // 퀘스트 명칭
             info,  // 퀘스트에 대한 상세한 설명
             goalInfo; // 퀘스트 목표
@@ -324,35 +323,16 @@ namespace TextRpg
             }
         }
 
-        // 임시 퀘스트 씬 : 퀘스트 완료, 보상 창을 보여주고 아무 키 입력으로 원래대로 돌아감
-        // 퀘스트가 완료되면 즉시 나왔다가 키 입력으로 사라짐
+
+        // 임시 퀘스트 씬을 만들려 했으나,
+        // 콘솔 화면을 임시 저장하는 기능은 없는 것으로 판명
+        // 따라서 기존 화면을 다시 불러올 수 있어야 하는데. 그럴려면 씬 번호라던지 식별할 수 있는 부분이 있어야 함
+        // 그냥 추가 메세지로 완료했다고 띄워주는 것으로 변경하기 >> 꾸밀 때 패널로 구분해줘도 좋다고 생각 !!!!!
         public void AlarmAccomplish()
         {
-            // 새로운 콘솔 출력창(새 창을 띄우진 않으나 새 문서 같은 느낌으로 덮어써서 보이게끔)
-            StringWriter stringWriter = new StringWriter();
-
-            // 기존 콘솔 출력창
-            TextWriter originalConsoleOut = Console.Out;
-
-            // 새로운 콘솔 출력창 출현(비어 있음)
-            Console.SetOut(stringWriter);
-
             // 퀘스트 달성 및 보상 알림
-            Console.WriteLine("퀘스트 달성\n\n{0}\n\n", title);
+            Console.WriteLine("<< 퀘스트 달성 >>\n{0}\n\n<< 보상 >>", title);
             PrintRewards();
-
-            Console.WriteLine("뒤로 가려면 아무 키나 눌러주세요.");
-            Console.ReadKey(); // 아무 키나 입력할 때까지 대기
-
-            // 입력으로 다른 화면 코드와 충돌할지 모르니 시간 대기도 옵션으로 만들어 두었습니다.
-            //Thread.Sleep(1000); // 1초간 대기 (대기 도중에 입력을 받아도 버퍼에만 쌓일 뿐 그 동안 다른 스크립트에서 작동하지 않습니다.)
-            // 입력 버퍼 비워주기 (대기 도중에 입력한 키 무효)
-            //while (Console.KeyAvailable)
-            //{
-            //    Console.ReadKey(true); // 매개변수를 true로 설정하면 키를 하나씩 읽으면서 콘솔에는 표시하지 않음
-            //}
-
-            Console.SetOut(originalConsoleOut); // 다시 원래 콘솔 출력창으로
         }
 
         // 퀘스트 보상 출력

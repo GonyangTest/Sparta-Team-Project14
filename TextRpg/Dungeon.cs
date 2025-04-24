@@ -49,52 +49,50 @@ namespace TextRpg
         {
             Console.Clear();
             List<Stage> stages = new List<Stage>();
+            int[] floor = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
             try
             {
                 Console.Clear();
                 Console.WriteLine("Battle");
-                /*for (int i=0; i<10 ; i++)
-                {
-                    switch (i)
-                    {
-                        case 1:
-                            //1스테이지에선 몬스터 3마리 1층몬스터만 소환
-                            break;
-                        case 2:
-                            //2스테이지에선 몬스터 3마리 2층몬스터까지 소환
-                            break;
-                        case 3:
-                            //2스테이지에선 몬스터 3마리 3층몬스터까지 소환
-                            break;
-                        case 4:
-                            //2스테이지에선 몬스터 3마리 4층몬스터까지 소환
-                            break;
-                        case 5:
-                            //2스테이지에선 몬스터 3마리 5층몬스터까지 소환,보스몹 소환
-                            break;
-                        case 6:
-                            //2스테이지에선 몬스터 3마리 6층몬스터까지 소환
-                            break;
-                        case 7:
-                            //2스테이지에선 몬스터 3마리 7층몬스터까지 소환
-                            break;
-                        case 8:
-                            //2스테이지에선 몬스터 3마리 8층몬스터까지 소환
-                            break;
-                        case 9:
-                            //2스테이지에선 몬스터 3마리 9층몬스터까지 소환
-                            break;
-                        default:
-                            //마지막 스테이지에선 몬스터 3마리 10층몬스터까지 소환,보스몹 소환
-                            break;
-                    }
-                    //stages.Add(new Stage("1단계", normalCount: 2, eliteCount: 1, bossCount: 0));
-                }*/
-                var stage1 = new Stage("1단계", normalCount: 2, eliteCount: 1, bossCount: 0);
-                var stage2 = new Stage("2단계", normalCount: 0, eliteCount: 1, bossCount: 1);
 
-                stage1.Start(player);
-                stage2.Start(player);
+                for(int i = 1; i<=floor.Length; i++)
+                {
+                    stages.Add(new Stage($"{i}단계",normalCount: 1, eliteCount: 1, bossCount: 1));
+                }
+
+                foreach(Stage stage in stages)
+                {
+                    stage.Start(player);
+                    if (player.hp <= 0)
+                    {
+                        Console.WriteLine("플레이어가 사망했습니다. 던전에서 퇴장합니다...");
+                        Thread.Sleep(2000);
+                        break;
+                    }
+
+                    if (!stage.Cleared)
+                    {
+                        Console.WriteLine("스테이지 클리어에 실패했습니다...");
+                        Thread.Sleep(2000);
+                        break;
+                    }
+
+                    // 다음 스테이지로 진행 여부
+                    Console.Clear();
+                    Console.WriteLine($"현재까지 {stage.Name} 스테이지 클리어!");
+                    Console.WriteLine("1. 다음 스테이지 도전");
+                    Console.WriteLine("0. 마을로 돌아가기");
+                    Console.Write("\n선택 >> ");
+                    string input = Console.ReadLine();
+
+                    if (input == "0")
+                    {
+                        Console.WriteLine("던전을 떠납니다...");
+                        Thread.Sleep(1000);
+                        break;
+                    }
+                }
+
             }
             catch (Exception ex)
             {
@@ -103,60 +101,6 @@ namespace TextRpg
             }
 
         }
-        /*private Stage CreateStageByLevel(int level)
-        {
-            string name = $"{level}단계";
-            int normal = 3;
-            int elite = 0;
-            int boss = 0;
-
-            // 각 층수별로 몬스터 구성 설정
-            switch (level)
-            {
-                case 1:
-                    // 1층 몬스터만 (노말 3)
-                    normal = 3;
-                    elite = 0;
-                    boss = 0;
-                    break;
-
-                case 2:
-                case 3:
-                case 4:
-                    // 1~4층 몬스터 포함 (노말 2~3, 엘리트 1)
-                    normal = 2;
-                    elite = 1;
-                    boss = 0;
-                    break;
-
-                case 5:
-                    // 5층 보스 등장 (노말 2, 엘리트 1, 보스 1)
-                    normal = 2;
-                    elite = 1;
-                    boss = 1;
-                    break;
-
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                    // 고층 몬스터 (엘리트 강화)
-                    normal = 1;
-                    elite = 2;
-                    boss = 0;
-                    break;
-
-                default:
-                    // 마지막 10층 (보스 등장)
-                    normal = 1;
-                    elite = 1;
-                    boss = 1;
-                    break;
-            }
-
-            return new Stage(name, normal, elite, boss);
-        }*/
-
     }
     public class Stage
     {
@@ -179,9 +123,11 @@ namespace TextRpg
             Name = name;
 
             Monsters = new List<Monster>();
+            
+
 
             for (int i = 0; i < normalCount; i++)
-                Monsters.Add(MonsterFactory.Create("1"));
+                Monsters.Add(MonsterFactory.Create($"1"));           
 
             for (int i = 0; i < eliteCount; i++)
                 Monsters.Add(MonsterFactory.Create("2"));
@@ -199,11 +145,18 @@ namespace TextRpg
             foreach (Monster monster in Monsters)
             {
                 Console.WriteLine(monster);
-                Battle(player, Monsters);
+                
             }
 
-            Cleared = true;
-            Console.WriteLine($"=== {Name} 스테이지 클리어! ===\n");
+            Battle(player, Monsters);
+
+            if(player.hp > 0 && Monsters.All(m => m.CurrentHP <= 0))
+            {
+                Cleared = true;
+                Console.WriteLine($"=== {Name} 스테이지 클리어! ===\n");
+            }
+
+            
             Console.WriteLine("계속하려면 아무 키나 누르세요...");
             Console.ReadKey();
         }
@@ -273,7 +226,7 @@ namespace TextRpg
                             Console.Clear();
                             Console.WriteLine("Battle!!\n");
 
-                            int retaliation = Math.Max(0, m.Attack - player.totalDefense);
+                            int retaliation = Math.Max(1, m.Attack - player.totalDefense);
                             player.hp -= retaliation;
 
                             Console.WriteLine($"Lv.{m.Level} {m.Name} 의 공격!");

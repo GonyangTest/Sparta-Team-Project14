@@ -34,9 +34,9 @@ namespace TextRpg
         }
 
         // PrintInfo 메소드 오버라이드
-        public override void PrintInfo()
+        public override string GetInfo()
         {
-            Console.WriteLine($" {itemName} | {EnumUtils.GetDescription(_optionType)} +{_recoveryAmount} | {description} | {(isPurchased ? "구매완료" : $"{price} G")}");
+            return $" {itemName} | {EnumUtils.GetDescription(_optionType)} +{_recoveryAmount} | {description} | {(isPurchased ? "구매완료" : $"{price} G")}";
         }
         // 아이템 사용
         public bool Use(Player player)

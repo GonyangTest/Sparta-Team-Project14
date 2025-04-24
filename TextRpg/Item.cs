@@ -23,11 +23,11 @@ namespace TextRpg
             price = pri;
             this.isPurchased = isPurchased;
         }
-        public virtual void PrintInfo()
+        public virtual string GetInfo()
         {// 상점창에서 아이템을 나타내는 양식, '?'는 삼항 연산자를 사용한 조건문으로 true면 "구매완료", false면 가격을 표시
          // 삼항연산자 조건문(bool변수 ? true일때 : false일때)
 
-            Console.WriteLine($" {itemName} | {description} | {(isPurchased ? "구매완료" : $"{price} G")}");
+            return $" {itemName} | {description} | {(isPurchased ? "구매완료" : $"{price} G")}";
         }
 
     }

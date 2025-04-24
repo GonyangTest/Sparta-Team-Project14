@@ -124,8 +124,6 @@ namespace TextRpg
 
             Monsters = new List<Monster>();
             
-
-
             for (int i = 0; i < normalCount; i++)
                 Monsters.Add(MonsterFactory.Create($"1"));           
 
@@ -164,10 +162,16 @@ namespace TextRpg
 
         private void Battle(Player player, List<Monster> monsters)
         {
+            Random rand = new Random();//플레이어에게 크리티컬 확률이없어 일시적으로 추가
+            int crit = 15;// 22
+            int eva = 10;
             while (true)
             {
                 Console.Clear();
                 Console.WriteLine("Battle!!\n");
+
+                crit = rand.Next(1, 101);
+                eva = rand.Next(1, 101);
 
                 // 몬스터 목록 출력
                 for (int i = 0; i < monsters.Count; i++)
@@ -205,10 +209,24 @@ namespace TextRpg
                     //damage = Math.Max(3, damage); //-> 데미지가 너무약하면 아래 코드 주석처리하고 이코드 풀어서 사용하세요
 
                     int damage = Math.Max(1, (int)(player.totalPower - target.Defense));
-                    target.CurrentHP -= damage;
 
-                    Console.WriteLine($"{player.playerName} 의 공격!");
-                    Console.WriteLine($"Lv.{target.Level} {target.Name} 을(를) 맞혔습니다. [데미지 : {damage}]");
+                    if (eva <= 10)
+                    {
+                        Console.WriteLine($"{player.playerName} 의 공격!");
+                        Console.WriteLine($"Lv.{target.Level} {target.Name} 을(를) 공격했지만 아무일도 일어나지 않았습니다.");
+                    }
+                    else
+                    {
+                        bool isCritical = crit <= 15;
+                        int finalDamage = isCritical ? (int)(damage * 1.6) : damage;
+                        target.CurrentHP -= finalDamage;
+
+                        Console.WriteLine($"{player.playerName} 의 공격!");
+                        Console.WriteLine(isCritical ? $"Lv.{target.Level} {target.Name} 을(를) 맞혔습니다. [데미지 : {finalDamage}] - 치명타 공격!!"
+                            : $"Lv.{target.Level} {target.Name} 을(를) 맞혔습니다. [데미지 : {finalDamage}]");
+                    }
+
+                    
 
                     if (target.CurrentHP <= 0)
                         Console.WriteLine($"\nLv.{target.Level} {target.Name}\nHP {target.MaxHP} -> Dead");

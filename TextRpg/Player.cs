@@ -244,7 +244,7 @@ namespace TextRpg
             }
         }
         //스킬 데미지
-        public float SkillPower(Skill skill)
+        public int SkillPower(Skill skill)
         {
             int skillPower = (int)(totalPower * skill.PowerMultiplier);
             return skillPower;

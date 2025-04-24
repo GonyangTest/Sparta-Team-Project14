@@ -5,6 +5,7 @@ using System.Numerics;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Spectre.Console;
 using static TextRpg.QuestForm;
 
 namespace TextRpg
@@ -149,95 +150,69 @@ namespace TextRpg
         public void PrintQuestList()
         {
             Console.Clear(); // 다른 화면에서 남은 부분이 있을지 모르니 Clear()
-            WriteLine_Color("Quest!!\n", ConsoleColor.Yellow);
+
+            // 선택지 리스트
+            List<string> questMenu = new List<string>();
             for (int i = 0; i < quests.Count; i++)
             {
-                Write_Color($"{i + 1}. ", ConsoleColor.Red); // 퀘스트 순번(+해당 번호 입력 시 내용 확인 가능하다고 알림)
-                Console.Write(quests[i].title); // 퀘스트 요약 타이틀 표시
+                string thisMenu = $"[red]{ i + 1}.[/] {quests[i].title}";
                 if (quests[i].isAccomplish) // 퀘스트 달성 여부 표시
-                    Write_Color(" (달성)", ConsoleColor.Red);
-                Console.WriteLine();
+                    thisMenu += "[red] (달성)[/]";
+                if (i == quests.Count - 1) // 마지막 메뉴 아래에 한줄 띄워주기
+                    thisMenu += "\n";
+                questMenu.Add(thisMenu);
             }
-            Console.WriteLine();
-            Console.Write("0. 나가기\n\n원하시는 퀘스트를 선택해주세요 >> ");
+            questMenu.Add("나가기"); // 나가기 메뉴도 추가
 
-            while (true)
+            // 선택지 프롬프트(여기서 입력 대기)
+            var menu = AnsiConsole.Prompt(
+           new SelectionPrompt<string>()
+           .Title("[yellow]Quest!![/]")
+           .PageSize(quests.Count+1) // 퀘스트 수 + 나가기 메뉴
+           .AddChoices(questMenu));
+
+            // 선택한 메뉴가 몇번째인가?
+            int index = 0;
+            foreach (var menus in questMenu)
             {
-                string next = Console.ReadLine();
-                int next_int;
-                if (!int.TryParse(next, out next_int))
-                {
-                    Console.Clear();
-                    Console.WriteLine("목록에 나온 숫자만 입력하세요.");
-                    Console.ReadKey();
-                }
+                if (menus == menu)
+                    break;
                 else
-                {
-                    // 0번: 뒤로가기(타운 씬으로 이동)
-                    if (next_int == 0)
-                    {
-                        Console.Clear();
-                        // !!!!! 타운 씬으로 이동하는 구문 넣기
-                        break;
-                    }
-
-                    // 1~퀘스트 갯수까지 >> 해당 퀘스트 상세 확인으로 이동
-                    else if(next_int <= quests.Count && next_int > 0)
-                    {
-                        PrintQuestDetail(next_int);
-                        break;
-                    }
-
-                    // 유효하지 않은 입력들에 대해
-                    else
-                    {
-                        Console.Clear();
-                        Console.WriteLine("목록에 나온 숫자만 입력하세요.");
-                        Console.ReadKey();
-                    }
-                }
+                    index++;
             }
+            if(index < quests.Count)
+                PrintQuestDetail(index);
+            // 나가기를 선택했다면 자동으로 마을로
         }
 
         // 퀘스트 씬1 : 선택한 퀘스트의 상세 정보 출력
         public void PrintQuestDetail(int index)
         {
-            index -= 1; // 퀘스트 항목 선택은 1부터 시작. 그러나 퀘스트 데이터는 0부터 시작하기에 차이 1만큼 빼주기
             Console.Clear();
-            WriteLine_Color("Quest!!\n", ConsoleColor.Yellow);
+            AnsiConsole.MarkupLine("[yellow]Quest!![/]\n");
             Console.Write(quests[index].title); // 퀘스트 요약 타이틀
             if(quests[index].isAccomplish)
-                Write_Color(" (달성)", ConsoleColor.Red);
+                AnsiConsole.Markup("[red] (달성)[/]");
             Console.WriteLine("\n");
             Console.WriteLine(quests[index].info); // 퀘스트 설명
             Console.WriteLine(quests[index].goalInfo, quests[index].count, quests[index].goal); // 목표 설명                                                                
-            quests[index].PrintRewards(); // 보상 설명
-            Console.WriteLine();
-            Console.Write("0. 나가기\n\n원하는 동작을 선택해주세요 >> ");
-            while (true)
+            // 퀘스트 보상 골드, 경험치 출력
+            AnsiConsole.Markup("GOLD : [yellow]{0}[/] G\nEXP : [yellow]{1}[/] Exp\n\n", quests[index].rewards.gold, quests[index].rewards.exp);
+            if (quests[index].rewards.items != null)
             {
-                string next = Console.ReadLine();
-                int next_int;
-                if (!int.TryParse(next, out next_int))
+                // 퀘스트 보상 아이템들 목록 전체에 대해
+                for (int i = 0; i < quests[index].rewards.items.Length; i++)
                 {
-                    Console.Clear();
-                    Console.WriteLine("목록에 나온 숫자만 입력하세요.");
-                    Console.ReadKey();
+                    // 아이템 이름 x 갯수 출력
+                    AnsiConsole.MarkupLine($"[yellow]{quests[index].rewards.items[i].item.itemName} x {quests[index].rewards.items[i].amount}[/]");
                 }
-                // 0번: 뒤로가기(퀘스트 목록 씬으로 이동)
-                else if (next_int == 0)
-                {
-                    Console.Clear();
-                    PrintQuestList();
-                    break;
-                }
-                else
-                {
-                    Console.Clear();
-                    Console.WriteLine("목록에 나온 숫자만 입력하세요.");
-                    Console.ReadKey();
-                }
+                Console.WriteLine(); // 한줄 더 띄워서 아래와 붙지 않도록
             }
+            Console.WriteLine();
+            // 선택지 프롬프트(여기서 입력 대기)
+            string menu = AnsiConsole.Prompt(new SelectionPrompt<string>().AddChoices("나가기\n")); // 줄바꿈이 없으면 나가기가 2줄 출력..???
+            // 입력을 받으면 퀘스트 목록으로 나가기
+            PrintQuestList();
         }
 
         // 퀘스트 달성도 경신 후 달성 여부 체크
@@ -247,20 +222,6 @@ namespace TextRpg
         public void QuestRenewal(int questIndex, int countChanged)
         {
             quests[questIndex].CheckAccomlish(questIndex, countChanged);
-        }
-
-        // 다른 글자색을 표현하기 위한 메서드들
-        public void WriteLine_Color(string text, ConsoleColor color)
-        {
-            Console.ForegroundColor = color; // 앞으로 사용할 글자 색상 교체
-            Console.WriteLine(text); // 바꾼 글자 색으로 출력하고 한줄 띄우기
-            Console.ResetColor(); // 색상 원복
-        }
-        public void Write_Color(string text, ConsoleColor color)
-        {
-            Console.ForegroundColor = color; // 앞으로 사용할 글자 색상 교체
-            Console.Write(text); // 바꾼 글자 색으로 출력하고
-            Console.ResetColor(); // 색상 원복
         }
     }
 
@@ -299,7 +260,7 @@ namespace TextRpg
                 isAccomplish = true; // 달성 상태 기록
                 Program.quest.Get_questData().Remove(questIndex); // 달성한 퀘스트는 데이터 딕셔너리에서 제거
                 Reward(); // 보상 지급
-                AlarmAccomplish(); // 보상 지급창 팝업
+                AlarmAccomplish(); // 보상 지급 메시지 출력
             }
         }
 
@@ -315,9 +276,10 @@ namespace TextRpg
                 // 보상 아이템들을 인벤토리에 추가
                 for(int i = 0;i < rewards.items.Length;i++)
                 {
+                    // 각 아이템 갯수에 맞게 획득
                     for (int j = 0; j < rewards.items[i].amount; j++)
                     {
-                        Program.inventory.inventory.Add(rewards.items[i].item); // 갯수에 맞게 각 아이템 획득
+                        Program.inventory.inventory.Add(rewards.items[i].item); 
                     }
                 }
             }
@@ -330,26 +292,23 @@ namespace TextRpg
         // 그냥 추가 메세지로 완료했다고 띄워주는 것으로 변경하기 >> 꾸밀 때 패널로 구분해줘도 좋다고 생각 !!!!!
         public void AlarmAccomplish()
         {
-            // 퀘스트 달성 및 보상 알림
-            Console.WriteLine("<< 퀘스트 달성 >>\n{0}\n\n<< 보상 >>", title);
-            PrintRewards();
-        }
-
-        // 퀘스트 보상 출력
-        public void PrintRewards()
-        {
-            // 퀘스트 보상 골드, 경험치 출력
-            Console.WriteLine("GOLD : {0} G\nEXP : {1} Exp\n\n", rewards.gold, rewards.exp);
+            string questResult = $"[yellow]{title}[/]\n\n<< 보상 >>\n골드: +{rewards.gold} G\n경험치: +{rewards.exp} Exp\n";
             if (rewards.items != null)
             {
+                questResult += "\n아이템\n";
                 // 퀘스트 보상 아이템들 목록 전체에 대해
                 for (int i = 0; i < rewards.items.Length; i++)
                 {
                     // 아이템 이름 x 갯수 출력
-                    Console.WriteLine($"{rewards.items[i].item.itemName} x {rewards.items[i].amount}");
+                    questResult += $"{rewards.items[i].item.itemName} x {rewards.items[i].amount}\n";
                 }
-                Console.WriteLine(); // 한줄 더 띄워서 아래와 붙지 않도록
             }
+            var panel = new Panel(questResult); // 패널 생성 및 안에 들어갈 내용
+            panel.Border = BoxBorder.Rounded;
+            panel.Header = new PanelHeader("[yellow bold]퀘스트 완료[/]", Justify.Center);
+            Console.WriteLine();
+            AnsiConsole.Write(panel);
+            Console.WriteLine();
         }
 
         // 현재 보상은 크게 골드, 경험치, 아이템 셋으로 나뉩니다.

@@ -9,7 +9,7 @@ using Spectre.Console;
 namespace TextRpg
 {
 
-    class Player
+    public class Player
     {
         public string playerName;
         public string playerClass;
@@ -27,8 +27,8 @@ namespace TextRpg
         public int criticalChance;
         public Job SelectedJob;
 
-        public ConsumableItem HealthPotion = new ConsumableItem("체력포션", "체력을 회복하는 포션", 50, ConsumableItem.OptionType.Health, 30, 3);
-        public ConsumableItem ManaPotion = new ConsumableItem("마나포션", "마나를 회복하는 포션", 100, ConsumableItem.OptionType.Mana, 30, 3);
+        public ConsumableItem HealthPotion = ItemFactory.CreateConsumableItem(GameConstance.Item.HEALTH_POTION_NAME, 3);
+        public ConsumableItem ManaPotion = ItemFactory.CreateConsumableItem(GameConstance.Item.MANA_POTION_NAME, 3);
 
         public Item EquippedWeapon;
         public Item EquippedArmor;

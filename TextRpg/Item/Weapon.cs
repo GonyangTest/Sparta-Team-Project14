@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TextRpg
 {
-    class Weapon : Item
+    public class Weapon : Item
     {// Item을 상속받는 상속클래스
         public int attack;
 

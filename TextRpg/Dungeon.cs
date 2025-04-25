@@ -6,6 +6,7 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using Spectre.Console;
+using static TextRpg.GameConstance;
 
 namespace TextRpg
 {
@@ -120,6 +121,9 @@ namespace TextRpg
 
         private static bool monstersLoaded = false;//
 
+        // 진행바 길이 !!!!!
+        int barWidth = 20, partician_Length = 15;
+
         public Stage(string name, int normalCount, int eliteCount, int bossCount)
         {
             if (!monstersLoaded)
@@ -144,6 +148,9 @@ namespace TextRpg
                 Monsters.Add(MonsterFactory.Create("3"));
 
             Cleared = false;
+
+            // 진행바 길이에 따라 변동
+            partician_Length += barWidth;
         }
 
         internal void Start(Player player)
@@ -163,7 +170,7 @@ namespace TextRpg
             Console.ReadKey();
         }
 
-
+        // !!!!!
         private void Battle(Player player, List<Monster> monsters)
         {
             // 몬스터가 다 죽었을 때는 루프를 빠져나가서 보상을 받을 수 있도록 변경
@@ -183,15 +190,11 @@ namespace TextRpg
                 // 몬스터 목록 출력
                 for (int i = 0; i < monsters.Count; i++)
                 {
-                    var m = monsters[i];
-                    string status = m.IsAlive ? $"HP {m.CurrentHP}" : "Dead";
-                    Console.WriteLine($"{i + 1}. Lv.{m.Level} {m.Name}  {status}");
+                    PrintEnemy(monsters[i], i);
                 }
 
-                Console.WriteLine("\n[내정보]");
-                Console.WriteLine($"Lv.{player.level} {player.playerName} ({player.playerClass})");
-                Console.WriteLine($"HP {player.hp}/{player.maxHp}\n");
-                Console.WriteLine($"MP {player.mana}/{player.maxMp}\n");
+                // 플레이어 출력
+                PrintPlayer(player);
 
                 string[] battleMenus = new string[] { "1. 기본 공격", "2. 스킬 공격\n", "0. 도망" };
 
@@ -229,6 +232,92 @@ namespace TextRpg
 
             // 던전 클리어 결과창
             Result(player, monsters);
+        }
+
+        void PrintPlayer(Player player)
+        {
+            AnsiConsole.MarkupLine($"[#6cf540]{new string('-', partician_Length)}[/]");
+            // 플레이어
+            AnsiConsole.Markup($"[yellow bold]{player.playerName}[/] ({player.playerClass}) Lv. {player.level}");
+            // HP바
+            AnsiConsole
+            .Progress()
+            .Columns(
+            // Column의 순서 변경 및 바 색상 변경
+                new TaskDescriptionColumn(), // 설명
+                new ProgressBarColumn
+                {
+                    Width = barWidth, // 진행바 길이
+                    CompletedStyle = new Style(foreground: Color.Red), // 채워진 부분 색상
+                    RemainingStyle = new Style(foreground: Color.Red3), // 채워지지 않은 부분 색상
+                    FinishedStyle = new Style(foreground: Color.Red), // 100% 일 때의 색상
+                })
+                .Start(x =>
+                {
+                    var task = x.AddTask("[red]HP[/]");
+                    float percentage = (float)player.hp * 100 / player.maxHp;
+                    task.Increment(percentage);
+                });
+            Console.SetCursorPosition(barWidth + 5, Console.GetCursorPosition().Top - 2);
+            AnsiConsole.MarkupLine($"[red]{player.hp}/{player.maxHp}[/]");
+
+            // MP바
+            AnsiConsole
+                .Progress()
+                .Columns(
+                // Column의 순서 변경 및 바 색상 변경
+                new TaskDescriptionColumn(), // 설명
+                new ProgressBarColumn
+                {
+                    Width = barWidth, // 진행바 길이
+                    CompletedStyle = new Style(foreground: Color.Blue), // 채워진 부분 색상
+                    RemainingStyle = new Style(foreground: Color.Blue3), // 채워지지 않은 부분 색상
+                    FinishedStyle = new Style(foreground: Color.Blue), // 100% 일 때의 색상
+                })
+                .Start(x =>
+                {
+                    var task = x.AddTask("[blue]MP[/]");
+                    float percentage = (float)player.mana * 100 / player.maxMp;
+                    task.Increment(percentage);
+                });
+            // 진행바 오른쪽에 커스텀 텍스트를 표시할 방법이 없음.. 그럼 커서 옮기고 써주면 되는 거 아닌가?
+            Console.SetCursorPosition(barWidth + 5, Console.GetCursorPosition().Top - 2);
+            AnsiConsole.MarkupLine($"[blue]{player.mana}/{player.maxMp}[/]\n");
+            Console.SetCursorPosition(0, Console.GetCursorPosition().Top - 1);
+            AnsiConsole.MarkupLine($"[#6cf540]{new string('-', partician_Length)}[/]\n");
+        }
+
+        void PrintEnemy(Monster monster, int i)
+        {
+            var m = monster;
+            AnsiConsole.MarkupLine(m.IsAlive ? $"{new string('-', partician_Length)}" : $"[gray]{new string('-', partician_Length)}[/]");
+            // 적 정보
+            string status = m.IsAlive ? $"{i + 1}. {m.Name} Lv.{m.Level}" : $"[gray]{i + 1}. Lv.{m.Name} {m.Level} (Dead)[/]";
+            AnsiConsole.MarkupLine(status);
+            // HP바
+            AnsiConsole
+                .Progress()
+                .Columns(
+                // Column의 순서 변경 및 바 색상 변경
+                new TaskDescriptionColumn(), // 설명
+                new ProgressBarColumn
+                {
+                    Width = barWidth, // 진행바 길이
+                    CompletedStyle = new Style(foreground: Color.Red), // 채워진 부분 색상
+                    RemainingStyle = m.IsAlive ? new Style(foreground: Color.Red3) : new Style(foreground: Color.FromHex("#a0a0a0")), // 채워지지 않은 부분 색상 + 사망 시 해당 색상이 100% >> 회색
+                    FinishedStyle = new Style(foreground: Color.Red), // 100% 일 때의 색상
+                })
+                .Start(x =>
+                {
+                    string status = m.IsAlive ? $"[red]HP[/]" : "[gray]HP[/]";
+                    var task = x.AddTask(status);
+                    float percentage = (float)m.CurrentHP * 100 / m.MaxHP;
+                    task.Increment(percentage);
+                });
+            Console.SetCursorPosition(barWidth + 5, Console.GetCursorPosition().Top - 2);
+            AnsiConsole.MarkupLine(m.IsAlive ? $"[red]{m.CurrentHP}/{m.MaxHP}[/]\n" : $"[gray]{m.CurrentHP}/{m.MaxHP}[/]\n");
+            Console.SetCursorPosition(0, Console.GetCursorPosition().Top - 1);
+            AnsiConsole.MarkupLine(m.IsAlive ? $"{new string('-', partician_Length)}\n" : $"[gray]{new string('-', partician_Length)}[/]\n");
         }
 
         void Result(Player player, List<Monster> monsters)
@@ -274,10 +363,10 @@ namespace TextRpg
                 {
                     // 패널 안에 들어갈 내용
                     string inPanel =
-                    $"Lv.{player.level} {player.playerName}\n" +
-                    $"HP {player.hp}/{player.maxHp}\n" +
-                    $"MP [blue]{++player.mana}[/]/{player.maxMp}\n\n" +
-                    $"  << 보상 >>\n" +
+                    $"[yellow bold]{player.playerName}[/] ({player.playerClass}) Lv. {player.level}\n" +
+                    $"HP {player.hp} / {player.maxHp}\n" +
+                    $"MP [blue]{++player.mana}[/] / {player.maxMp}\n\n" +
+                    $"<< 보상 >>\n" +
                     $"골  드: +[yellow]{gold}[/] G\n" +
                     $"경험치: +[yellow]{exp}[/] Exp";
 

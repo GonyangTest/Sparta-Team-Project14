@@ -5,11 +5,12 @@ using System.Reflection.Emit;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 using Spectre.Console;
 namespace TextRpg
 {
 
-    class Player
+    public class Player
     {
         public string playerName;
         public string playerClass;
@@ -27,8 +28,8 @@ namespace TextRpg
         public int criticalChance;
         public Job SelectedJob;
 
-        public ConsumableItem HealthPotion = new ConsumableItem("체력포션", "체력을 회복하는 포션", 50, ConsumableItem.OptionType.Health, 30, 3);
-        public ConsumableItem ManaPotion = new ConsumableItem("마나포션", "마나를 회복하는 포션", 100, ConsumableItem.OptionType.Mana, 30, 3);
+        public ConsumableItem HealthPotion = ItemFactory.CreateConsumableItem(GameConstance.Item.HEALTH_POTION_NAME, 3);
+        public ConsumableItem ManaPotion = ItemFactory.CreateConsumableItem(GameConstance.Item.MANA_POTION_NAME, 3);
 
         public Item EquippedWeapon;
         public Item EquippedArmor;
@@ -200,23 +201,60 @@ namespace TextRpg
 
         public string PrintPlayer()
         {
-                Console.WriteLine("상태보기\n");
-                Console.WriteLine("캐릭터의 정보가 표시됩니다.\n");
-                return $"[플레이어 정보]\n" +
-                $"이름: {playerName}\n" +
-                $"직업: {playerClass}\n" +
-                $"레벨: {level}\n" +
-                $"경험치: {exp}/{maxExp}\n" +
-                $"체력: {hp}/{maxHp}\n" +
-                $"마력: {mana}/{maxMp}\n" +
-                $"공격력: {totalPower}\n" +
-                $"방어력: {totalDefense}\n" +
-                $"민첩: {agility}\n" +
-                $"치명타확률: {criticalChance}\n" +
-                $"장착 무기: {(EquippedWeapon != null ? EquippedWeapon.itemName : "없음")}\n" +
-                $"장착 방어구: {(EquippedArmor != null ? EquippedArmor.itemName : "없음")}\n" +
-                $"골드 : {gold} G\n" +
-                $"[스킬목록]\n{string.Join("\n", SkillFactory.GetSkillsByJob(playerClass).Select(skill => skill.ToString()))}";
+                AnsiConsole.MarkupLine("[yellow]상태보기[/]\n");
+                AnsiConsole.MarkupLine("캐릭터의 정보가 표시됩니다.\n");
+
+                // 테이블 생성 및 설정
+                var statTable = new Table();
+                statTable.Border = TableBorder.Rounded;
+                
+                // 테이블 컬럼 추가
+                statTable.AddColumn(new TableColumn("[yellow]특성[/]").Centered());
+                statTable.AddColumn(new TableColumn("[yellow]수치[/]").Centered());
+                
+                // 테이블에 행 추가
+                statTable.AddRow("[white]이름[/]", $"{playerName}");
+                statTable.AddRow("[white]직업[/]", $"{playerClass}");
+                statTable.AddRow("[white]레벨[/]", $"{level}");
+                statTable.AddRow("[white]경험치[/]", $"{exp}/{maxExp}");
+                statTable.AddRow("[white]체력[/]", $"{hp}/{maxHp}");
+                statTable.AddRow("[white]마력[/]", $"{mana}/{maxMp}");
+                statTable.AddRow("[white]공격력[/]", $"{totalPower}");
+                statTable.AddRow("[white]방어력[/]", $"{totalDefense}");
+                statTable.AddRow("[white]민첩[/]", $"{agility}");
+                statTable.AddRow("[white]치명타확률[/]", $"{criticalChance}%");
+                statTable.AddRow("[white]골드[/]", $"{gold} G");
+                AnsiConsole.Write(statTable);
+
+                // 장비 테이블 생성
+                var equipmentTable = new Table();
+                equipmentTable.Border = TableBorder.Rounded;
+
+                // 장비 테이블 컬럼 추가
+                equipmentTable.AddColumn(new TableColumn("[yellow]장비 이름[/]").Centered());
+                equipmentTable.AddColumn(new TableColumn("[yellow]장비 타입[/]").Centered());
+                
+                // 장비 테이블에 행 추가
+                equipmentTable.AddRow("[cyan]장착 무기[/]", $"{(EquippedWeapon != null ? EquippedWeapon.itemName : "없음")}");
+                equipmentTable.AddRow("[cyan]장착 방어구[/]", $"{(EquippedArmor != null ? EquippedArmor.itemName : "없음")}");
+                AnsiConsole.Write(equipmentTable);
+                
+                var skillTable = new Table();
+                skillTable.Border = TableBorder.Rounded;
+                
+                // 스킬 테이블 컬럼 추가
+                skillTable.AddColumn(new TableColumn("[yellow]스킬 이름[/]").Centered());
+                skillTable.AddColumn(new TableColumn("[yellow]데미지 배율[/]").Centered());
+                skillTable.AddColumn(new TableColumn("[yellow]마나 소모량[/]").Centered());
+                skillTable.AddColumn(new TableColumn("[yellow]유형[/]").Centered());
+
+                var skills = SkillFactory.GetSkillsByJob(playerClass);
+                foreach (var skill in skills)
+                {
+                    skillTable.AddRow($"[cyan]{skill.Name}[/]", $"{skill.PowerMultiplier}x", $"{skill.ManaCost}", $"{skill.Type}");
+                }
+                AnsiConsole.Write(skillTable);
+                return "";
         }
     }
 }

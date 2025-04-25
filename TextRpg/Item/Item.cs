@@ -7,7 +7,7 @@ using System.ComponentModel;
 
 namespace TextRpg
 {
-    class Item
+    public class Item
     {
         // 상속개념 파악하기
         // 아이템 생성자 생성했으니까 출력하고 공격무기 방어무기 나눠 (상속)

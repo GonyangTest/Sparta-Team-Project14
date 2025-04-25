@@ -7,7 +7,7 @@ using System.ComponentModel;
 
 namespace TextRpg
 {
-    class ConsumableItem : Item
+    public class ConsumableItem : Item
     {
         public enum OptionType
         {
@@ -16,7 +16,7 @@ namespace TextRpg
             [Description("마나 회복")]
             Mana,       // 마나 회복
         }
-
+    
         private OptionType _optionType;
         private int _recoveryAmount;
         private int _quantity;

@@ -177,6 +177,9 @@ namespace TextRpg
             defense = SelectedJob.Defense;
             agility = SelectedJob.Agility;
             criticalChance = SelectedJob.CriticalChance;
+
+            // 새로 시작할 때 퀘스트 데이터 초기화 필요
+            Program.quest.InitQuestData();
         }
 
         public bool UseHealthPotion()

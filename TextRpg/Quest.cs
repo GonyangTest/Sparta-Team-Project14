@@ -67,83 +67,105 @@ namespace TextRpg
             QuestForm questTmp = new QuestForm();// 임시 퀘스트폼
             int index = 0;
 
-            ResetForm(ref questTmp, ref index); // 임시 퀘스트폼 공통 부분 초기화
+            #region 퀘스트 데이터
+            ////////////////////////////////////////////////////////////////// 한 블럭 복사하여 새 퀘스트 추가 가능
+            questTmp = new QuestForm();// 임시 퀘스트폼
+            // 안내문
             questTmp.title = "마을을 위협하는 몬스터 처치";
             questTmp.info = "이봐! 마을 근처에 몬스터들이 너무 많아졌다고 생각하지 않나?\n" +
                             "마을주민들의 안전을 위해서라도 저것들 수를 좀 줄여야 한다고!\n" +
                             "모험가인 자네가 좀 처치해주게!\n";
             questTmp.goalInfo = " - 몬스터 5마리 처치";
+            // 목표
             questTmp.goal = 5;
+            // 카운트 방식 (true: 받은 값 써주기, false: 받은 값 더하기)
             questTmp.isOverrideCount = false;
+            // 보상
             questTmp.rewards.exp = 0;
             questTmp.rewards.gold = 5;
             // 퀘스트 클리어 후 아이템 지급 테스트 용도로 임의로 상점에 팔지 않는 아이템 하나 생성
             questTmp.rewards.items = new RewardItem[] { new RewardItem(new Armor("초심자 갑옷", 1, "최소한의 보호 장비", 50, false), 1) };
-            quests.Add(questTmp); // 리스트는 값을 참조 >> 추가할 때 questTmp의 값을 복사하여 새로운 원소로 만듦
+            // 퀘스트 리스트에 추가
+            quests.Add(questTmp);
 
-            ResetForm(ref questTmp, ref index);
+
+            //////////////////////////////////////////////////////////////////////// 한 블럭 복사하여 새 퀘스트 추가 가능
+            questTmp = new QuestForm();// 임시 퀘스트폼
+            // 안내문
             questTmp.title = "장비를 장착해보자";
             questTmp.info = "훌륭한 모험가는 좋은 장비를 착용하는 법이지\n" +
                             "맨손으로 몬스터에게 맞선다고? 자네 제정신인가?\n" +
                             "아무 장비라도 하나 걸쳐보게\n";
             questTmp.goalInfo = " - 장비 착용해보기";
+            // 목표
             questTmp.goal = 1;
+            // 카운트 방식 (true: 받은 값 써주기, false: 받은 값 더하기)
             questTmp.isOverrideCount = true;
+            // 보상
             questTmp.rewards.exp = 10;
             questTmp.rewards.gold = 0;
             questTmp.rewards.items = null;
+            // 퀘스트 리스트에 추가
             quests.Add(questTmp);
 
-            ResetForm(ref questTmp, ref index);
+            /////////////////////////////////////////////////////////////////////////// 한 블럭 복사하여 새 퀘스트 추가 가능
+            questTmp = new QuestForm();// 임시 퀘스트폼
+            // 안내문
             questTmp.title = "더욱 더 강해지기";
             questTmp.info = "모험가 협회에서는 모험가들에게 지원을 하고 있다네\n" +
                             "일정 수준 이상의 모험가들은 협회에도 귀한 자원이니 말일세\n" +
                             "레벨 5를 달성한다면 다시 오게나\n";
             questTmp.goalInfo = " - 레벨 달성";
+            // 목표
             questTmp.goal = 5;
-            questTmp.rewards.exp = 0;
+            // 카운트 방식 (true: 받은 값 써주기, false: 받은 값 더하기)
             questTmp.isOverrideCount = true;
+            // 보상
+            questTmp.rewards.exp = 0;
             questTmp.rewards.gold = 1000;
             questTmp.rewards.items = null;
+            // 퀘스트 리스트에 추가
             quests.Add(questTmp);
+
+            #endregion
         }
 
-        void ResetForm(ref QuestForm tmpForm, ref int index)
+        public void InitQuestData()
         {
-            // !!!!! 저장 데이터가 있다면
-            // index 번째의 퀘스트가 달성 >> tmpForm.isAccomplish = true; tmpForm.count = (데이터 값); 을 받기(당장 쓰지 않더라도 나중에 확장하면 쌓인 데이터로 바로 퀘스트 클리어 가능하게끔 할 수 있음. 계속 플레이한 유저들에게 효용감을 줄 수 있음)
-            // 달성하지 못했다면 tmpForm.isAccomplish = false; tmpForm.count = (데이터 값); 을 받기
-            //if (저장 데이터가 있다면)
-            //{
-            //    // 해당 퀘스트 번호를 키로 가지고 있다면
-            //    if (questData.ContainsKey(index))
-            //    {
-            //        // 해당 퀘스트 미완
-            //        tmpForm.isAccomplish = false;
-            //        // 퀘스트 달성도 값 불러오기
-            //        questData.TryGetValue(index, out tmpForm.count);
-            //    }
-            //    // 해당 퀘스트 번호가 없다면
-            //    else
-            //    {
-            //        // 해당 퀘스트 완료
-            //        tmpForm.isAccomplish = true;
-            //        // 목표값으로 덮어쓰기
-            //        tmpForm.count = tmpForm.goal;
-            //    }
-            //}
-            // 저장데이터가 없다면
-            //else
-            //{
-            // 생성 초기에 공통적으로 달성하지 않은 상태
-            tmpForm = new QuestForm();// 임시 퀘스트폼
-            tmpForm.isAccomplish = false;
-                tmpForm.count = 0;
-                questData.Add(index, 0); // 해당 퀘스트 달성도 0으로 집어넣기
-            //}
+            // 모든 퀘스트에 대해
+            for (int i = 0; i < quests.Count; i++)
+            {
+                // 생성 초기에 공통적으로 달성하지 않은 상태
+                quests[i].isAccomplish = false;
+                quests[i].count = 0;
 
-            // 다음 저장 데이터로
-            index += 1;
+                // 새 저장 데이터 생성
+                questData.Add(i, 0);
+            }
+        }
+
+        public void LoadQuestData()
+        {
+            // 모든 퀘스트에 대해
+            for (int i = 0; i < quests.Count; i++)
+            {
+                // 해당 퀘스트 번호를 키로 가지고 있다면
+                if (questData.ContainsKey(i))
+                {
+                    // 해당 퀘스트 미완
+                    quests[i].isAccomplish = false;
+                    // 퀘스트 달성도 값 불러오기
+                    questData.TryGetValue(i, out quests[i].count);
+                }
+                // 해당 퀘스트 번호가 없다면
+                else
+                {
+                    // 해당 퀘스트 완료
+                    quests[i].isAccomplish = true;
+                    // 목표값으로 덮어쓰기
+                    quests[i].count = quests[i].goal;
+                }
+            }
         }
 
         // 퀘스트 씬0 : 퀘스트 목록들 출력 >> 마을에서 볼 수 있게끔 하기
@@ -290,7 +312,7 @@ namespace TextRpg
         // 임시 퀘스트 씬을 만들려 했으나,
         // 콘솔 화면을 임시 저장하는 기능은 없는 것으로 판명
         // 따라서 기존 화면을 다시 불러올 수 있어야 하는데. 그럴려면 씬 번호라던지 식별할 수 있는 부분이 있어야 함
-        // 그냥 추가 메세지로 완료했다고 띄워주는 것으로 변경하기 >> 꾸밀 때 패널로 구분해줘도 좋다고 생각 !!!!!
+        // 그냥 추가 메세지로 완료했다고 띄워주는 것으로 변경하기 >> 꾸밀 때 패널로 구분해줘도 좋다고 생각 
         public void AlarmAccomplish()
         {
             string questResult = $"[yellow]{title}[/]\n\n<< 보상 >>\n골드: +{rewards.gold} G\n경험치: +{rewards.exp} Exp\n";

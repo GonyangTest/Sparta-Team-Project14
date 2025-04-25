@@ -22,7 +22,6 @@ internal class Program
         if (SaveLoadManager.SaveFileExists())  // 저장된 게임 파일이 있으면 불러오기
         {
             Console.WriteLine("저장된 기록이 있습니다. 불러오시겠습니까?");
-            string saveSelect = Console.ReadLine();
             List<string> startMenu = new List<string>
                 {
                     "1. 불러오기",

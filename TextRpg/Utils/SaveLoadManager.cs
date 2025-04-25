@@ -28,12 +28,12 @@ namespace TextRpg
                 // 장착 아이템 인덱스 저장
                 if (player.EquippedWeapon != null)
                 {
-                    gameData.PlayerData.EquippedWeaponIndex = inventory.inventory.IndexOf(player.EquippedWeapon);
+                    gameData.PlayerData.EquippedWeaponIndex = inventory.getInventory().IndexOf(player.EquippedWeapon);
                 }
 
                 if (player.EquippedArmor != null)
                 {
-                    gameData.PlayerData.EquippedArmorIndex = inventory.inventory.IndexOf(player.EquippedArmor);
+                    gameData.PlayerData.EquippedArmorIndex = inventory.getInventory().IndexOf(player.EquippedArmor);
                 }
 
                 // 퀘스트 데이터 저장
@@ -91,15 +91,15 @@ namespace TextRpg
 
                 // 장착 아이템 설정
                 if (gameData.PlayerData.EquippedWeaponIndex >= 0 &&
-                    gameData.PlayerData.EquippedWeaponIndex < inventory.inventory.Count)
+                    gameData.PlayerData.EquippedWeaponIndex < inventory.getInventory().Count)
                 {
-                    player.EquippedWeapon = inventory.inventory[gameData.PlayerData.EquippedWeaponIndex] as Weapon;
+                    player.EquippedWeapon = inventory.getInventory()[gameData.PlayerData.EquippedWeaponIndex] as Weapon;
                 }
 
                 if (gameData.PlayerData.EquippedArmorIndex >= 0 &&
-                    gameData.PlayerData.EquippedArmorIndex < inventory.inventory.Count)
+                    gameData.PlayerData.EquippedArmorIndex < inventory.getInventory().Count)
                 {
-                    player.EquippedArmor = inventory.inventory[gameData.PlayerData.EquippedArmorIndex] as Armor;
+                    player.EquippedArmor = inventory.getInventory()[gameData.PlayerData.EquippedArmorIndex] as Armor;
                 }
 
                 // 퀘스트 데이터 적용

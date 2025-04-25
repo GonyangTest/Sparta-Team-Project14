@@ -17,7 +17,7 @@ namespace TextRpg
         public void FromInventory(Inventory inventory)
         {
             Items.Clear();
-            foreach (var item in inventory.inventory)
+            foreach (var item in inventory.getInventory())
             {
                 Items.Add(ItemData.FromItem(item));
             }
@@ -26,10 +26,10 @@ namespace TextRpg
         // InventoryData 객체를 Inventory 객체에 적용
         public void ToInventory(Inventory inventory)
         {
-            inventory.inventory.Clear();
+            inventory.getInventory().Clear();
             foreach (var itemData in Items)
             {
-                inventory.inventory.Add(itemData.ToItem());
+                inventory.getInventory().Add(itemData.ToItem());
             }
         }
     }

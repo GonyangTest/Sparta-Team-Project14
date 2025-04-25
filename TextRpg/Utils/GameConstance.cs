@@ -81,7 +81,7 @@ namespace TextRpg
             public const string MONSTER_CSV_PATH = @"..\..\..\monsters.csv";
         }
 
-        public static class Shop
+        public static class Rest
         {
             public const int USE_POTION_SLEEP_TIME = 300;
         }

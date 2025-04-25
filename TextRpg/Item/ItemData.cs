@@ -33,22 +33,22 @@ namespace TextRpg
         {
             var itemData = new ItemData
             {
-                Name = item.itemName,
-                Description = item.description,
-                Price = item.price,
-                IsPurchased = item.isPurchased
+                Name = item.ItemName,
+                Description = item.Description,
+                Price = item.Price,
+                IsPurchased = item.IsPurchased
             };
 
             // 아이템 타입에 따라 추가 정보 저장
             if (item is Weapon weapon)
             {
                 itemData.Type = "Weapon";
-                itemData.Attack = weapon.attack;
+                itemData.Attack = weapon.Attack;
             }
             else if (item is Armor armor)
             {
                 itemData.Type = "Armor";
-                itemData.Defense = armor.defense;
+                itemData.Defense = armor.Defense;
             }
             else if (item is ConsumableItem consumable)
             {

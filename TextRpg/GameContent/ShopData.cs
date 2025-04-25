@@ -46,11 +46,11 @@ namespace TextRpg
                 if (shopItem != null)
                 {
                     // 저장된 데이터에서 일치하는 아이템 찾기
-                    var savedItem = Items.FirstOrDefault(i => i.Name == shopItem.itemName);
+                    var savedItem = Items.FirstOrDefault(i => i.Name == shopItem.ItemName);
                     if (savedItem != null)
                     {
                         // 구매 상태 복원
-                        shopItem.isPurchased = savedItem.IsPurchased;
+                        shopItem.IsPurchased = savedItem.IsPurchased;
                     }
                 }
             }

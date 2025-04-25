@@ -38,9 +38,9 @@ namespace TextRpg
                         index++;
                 }
                 if (index == 0)
-                    UsePotion(player, 1);
+                    UsePotion(player, 1); // 체력 포션 사용
                 else if (index == 1)
-                    UsePotion(player, 2);
+                    UsePotion(player, 2); // 마나 포션 사용
                 else
                     break;
             }
@@ -57,7 +57,7 @@ namespace TextRpg
                     player.UseManaPotion();
                     break;
             }
-            Thread.Sleep(300); // 포션 사용/사용불가 메세지가 출력 후 보여지는 시간이 필요하여 추가
+            Thread.Sleep(GameConstance.Rest.USE_POTION_SLEEP_TIME); // 포션 사용/사용불가 메세지가 출력 후 보여지는 시간이 필요하여 추가
         }
     }
 }

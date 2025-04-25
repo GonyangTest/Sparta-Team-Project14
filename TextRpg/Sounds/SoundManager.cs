@@ -8,17 +8,17 @@ namespace TextRpg
 {
     public class SoundManager
     {
-        private static SoundManager instance;
+        private static SoundManager _instance;
 
         public static SoundManager Instance
         {
             get
             {
-                if(instance == null)
+                if(_instance == null)
                 {
-                    instance = new SoundManager();
+                    _instance = new SoundManager();
                 }
-                return instance;
+                return _instance;
             }
         }
 

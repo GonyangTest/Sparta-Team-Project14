@@ -227,7 +227,7 @@ namespace TextRpg
                 for (int i = 0; i < quests[index].rewards.items.Length; i++)
                 {
                     // 아이템 이름 x 갯수 출력
-                    AnsiConsole.MarkupLine($"[yellow]{quests[index].rewards.items[i].item.itemName} x {quests[index].rewards.items[i].amount}[/]");
+                    AnsiConsole.MarkupLine($"[yellow]{quests[index].rewards.items[i].item.ItemName} x {quests[index].rewards.items[i].amount}[/]");
                 }
                 Console.WriteLine(); // 한줄 더 띄워서 아래와 붙지 않도록
             }
@@ -302,7 +302,7 @@ namespace TextRpg
                     // 각 아이템 갯수에 맞게 획득
                     for (int j = 0; j < rewards.items[i].amount; j++)
                     {
-                        Program.inventory.inventory.Add(rewards.items[i].item); 
+                        Program.inventory.getInventory().Add(rewards.items[i].item); 
                     }
                 }
             }
@@ -323,7 +323,7 @@ namespace TextRpg
                 for (int i = 0; i < rewards.items.Length; i++)
                 {
                     // 아이템 이름 x 갯수 출력
-                    questResult += $"{rewards.items[i].item.itemName} x {rewards.items[i].amount}\n";
+                    questResult += $"{rewards.items[i].item.ItemName} x {rewards.items[i].amount}\n";
                 }
             }
             var panel = new Panel(questResult); // 패널 생성 및 안에 들어갈 내용

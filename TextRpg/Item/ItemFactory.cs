@@ -71,19 +71,19 @@ namespace TextRpg
                 // 원본이 수정되지 않도록 복사본 반환
                 if (item is Weapon weapon)
                 {
-                    items.Add(new Weapon(item.itemName, weapon.attack, item.description, item.price, item.isPurchased));
+                    items.Add(new Weapon(item.ItemName, weapon.Attack, item.Description, item.Price, item.IsPurchased));
                 }
                 else if (item is Armor armor)
                 {
-                    items.Add(new Armor(item.itemName, armor.defense, item.description, item.price, item.isPurchased));
+                    items.Add(new Armor(item.ItemName, armor.Defense, item.Description, item.Price, item.IsPurchased));
                 }
                 else if (item is ConsumableItem consumable)
                 {
-                    items.Add(new ConsumableItem(item.itemName, item.description, item.price, consumable.Option, consumable.RecoveryAmount, consumable.Quantity));
+                    items.Add(new ConsumableItem(item.ItemName, item.Description, item.Price, consumable.Option, consumable.RecoveryAmount, consumable.Quantity));
                 }
                 else
                 {
-                    items.Add(new Item(item.itemName, item.description, item.price, item.isPurchased));
+                    items.Add(new Item(item.ItemName, item.Description, item.Price, item.IsPurchased));
                 }
             }
             
@@ -98,15 +98,15 @@ namespace TextRpg
                 // 원본이 수정되지 않도록 복사본 반환
                 if (item is Weapon weapon)
                 {
-                    return new Weapon(item.itemName, weapon.attack, item.description, item.price, item.isPurchased);
+                    return new Weapon(item.ItemName, weapon.Attack, item.Description, item.Price, item.IsPurchased);
                 }
                 else if (item is Armor armor)
                 {
-                    return new Armor(item.itemName, armor.defense, item.description, item.price, item.isPurchased);
+                    return new Armor(item.ItemName, armor.Defense, item.Description, item.Price, item.IsPurchased);
                 }
                 else if (item is ConsumableItem consumable)
                 {
-                    return new ConsumableItem(item.itemName, item.description, item.price, consumable.Option, consumable.RecoveryAmount, consumable.Quantity);
+                    return new ConsumableItem(item.ItemName, item.Description, item.Price, consumable.Option, consumable.RecoveryAmount, consumable.Quantity);
                 }
 
             }
@@ -119,7 +119,7 @@ namespace TextRpg
             {
                 if (item is ConsumableItem consumable)
                 {
-                    return new ConsumableItem(item.itemName, item.description, item.price, consumable.Option, consumable.RecoveryAmount, quantity);
+                    return new ConsumableItem(item.ItemName, item.Description, item.Price, consumable.Option, consumable.RecoveryAmount, quantity);
                 }
             }
             return null;

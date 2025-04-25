@@ -36,7 +36,7 @@ namespace TextRpg
         // PrintInfo 메소드 오버라이드
         public override string GetInfo()
         {
-            return $" {itemName} | {EnumUtils.GetDescription(_optionType)} +{_recoveryAmount} | {description} | {(isPurchased ? "구매완료" : $"{price} G")}";
+            return $" {ItemName} | {EnumUtils.GetDescription(_optionType)} +{_recoveryAmount} | {Description} | {(_isPurchased ? "구매완료" : $"{_price} G")}";
         }
         // 아이템 사용
         public bool Use(Player player)
@@ -52,7 +52,7 @@ namespace TextRpg
             
             string effectType = EnumUtils.GetDescription(_optionType);
             
-            Console.WriteLine($"{itemName}을(를) 사용했습니다. {effectType} +{_recoveryAmount} 효과를 얻었습니다.");
+            Console.WriteLine($"{ItemName}을(를) 사용했습니다. {effectType} +{_recoveryAmount} 효과를 얻었습니다.");
             Console.WriteLine($"남은 수량: {Quantity}");
             
             // 효과 적용

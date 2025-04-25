@@ -7,12 +7,14 @@ namespace TextRpg
 {
     class Inventory
     {
-        public List<Item> inventory;
+        private List<Item> _inventory;
+
+        public List<Item> getInventory() { return _inventory; }
 
         // Shop을 받지 않도록 수정 (굳이 Shop을 인자로 받지 않음)
         public Inventory()
         {
-            inventory = new List<Item>();
+            _inventory = new List<Item>();
         }
 
         public void ShowInventory(Player player)
@@ -29,22 +31,22 @@ namespace TextRpg
                 Console.WriteLine("인벤토리\n보유 중인 아이템을 관리할 수 있습니다.\n");
                 Console.WriteLine("[아이템 목록]");
 
-                for (int i = 0; i < inventory.Count; i++)
+                for (int i = 0; i < _inventory.Count; i++)
                 {
-                    Item item = inventory[i];
+                    Item item = _inventory[i];
 
                     string equipTag = "";
                     if (item == player.EquippedWeapon || item == player.EquippedArmor) // 장착 여부 확인
                         equipTag = "[E]";
 
-                    Console.Write($"- {equipTag}{item.itemName.PadRight(12)} | ");
+                    Console.Write($"- {equipTag}{item.ItemName.PadRight(12)} | ");
 
                     if (item is Weapon weapon)
-                        Console.Write($"공격력 +{weapon.attack} | ");
+                        Console.Write($"공격력 +{weapon.Attack} | ");
                     else if (item is Armor armor)
-                        Console.Write($"방어력 +{armor.defense} | ");
+                        Console.Write($"방어력 +{armor.Defense} | ");
 
-                    Console.WriteLine($"{item.description}");
+                    Console.WriteLine($"{item.Description}");
                 }
 
 
@@ -81,7 +83,7 @@ namespace TextRpg
                 Console.WriteLine("인벤토리 - 장착 관리\n보유 중인 아이템을 관리할 수 있습니다.\n");
                 
                 // 취소 옵션을 포함하기 위해 아이템 목록에 null 추가
-                var itemChoices = new List<Item>(inventory);
+                var itemChoices = new List<Item>(_inventory);
                 itemChoices.Add(null); // 나가기 옵션
                 
                 // Spectre.Console의 SelectionPrompt 사용
@@ -95,17 +97,17 @@ namespace TextRpg
                             if (item == null) return "0. 나가기";
                             
                             // 인덱스 계산
-                            int itemIndex = inventory.IndexOf(item) + 1;
+                            int itemIndex = _inventory.IndexOf(item) + 1;
                             
                             string equippedMark = "";
                             if (item == player.EquippedWeapon || item == player.EquippedArmor)
                                 equippedMark = "[[E]] ";
                             
-                            string stat = item is Weapon w ? $"공격력 +{w.attack}" :
-                                        item is Armor a ? $"방어력 +{a.defense}" :
+                            string stat = item is Weapon w ? $"공격력 +{w.Attack}" :
+                                        item is Armor a ? $"방어력 +{a.Defense}" :
                                         "";
                             
-                            return $"{itemIndex}. {equippedMark}{item.itemName,-12} | {stat} | {item.description}";
+                            return $"{itemIndex}. {equippedMark}{item.ItemName,-12} | {stat} | {item.Description}";
                         })
                 );
                 
@@ -119,12 +121,12 @@ namespace TextRpg
                     if (player.EquippedWeapon == selectedItem)
                     {
                         player.EquippedWeapon = null;
-                        AnsiConsole.MarkupLine($"[green]{selectedItem.itemName}[/] 을(를) 해제했습니다! (무기)");
+                        AnsiConsole.MarkupLine($"[green]{selectedItem.ItemName}[/] 을(를) 해제했습니다! (무기)");
                     }
                     else
                     {
                         player.EquippedWeapon = weapon;
-                        AnsiConsole.MarkupLine($"[green]{selectedItem.itemName}[/] 을(를) 장착했습니다! (무기)");
+                        AnsiConsole.MarkupLine($"[green]{selectedItem.ItemName}[/] 을(를) 장착했습니다! (무기)");
                         Program.quest.QuestRenewal(1, 1); // 장비 장착 퀘스트 판정
                     }
                 }
@@ -133,12 +135,12 @@ namespace TextRpg
                     if (player.EquippedArmor == selectedItem)
                     {
                         player.EquippedArmor = null;
-                        AnsiConsole.MarkupLine($"[green]{selectedItem.itemName}[/] 을(를) 해제했습니다! (방어구)");
+                        AnsiConsole.MarkupLine($"[green]{selectedItem.ItemName}[/] 을(를) 해제했습니다! (방어구)");
                     }
                     else
                     {
                         player.EquippedArmor = armor;
-                        AnsiConsole.MarkupLine($"[green]{selectedItem.itemName}[/] 을(를) 장착했습니다! (방어구)");
+                        AnsiConsole.MarkupLine($"[green]{selectedItem.ItemName}[/] 을(를) 장착했습니다! (방어구)");
                         Program.quest.QuestRenewal(1, 1); // 장비 장착 퀘스트 판정
                     }
                 }
@@ -153,15 +155,15 @@ namespace TextRpg
         }
         public void RemoveItem(Item item)
         {
-            if (inventory.Contains(item))
+            if (_inventory.Contains(item))
             {
-                inventory.Remove(item);
+                _inventory.Remove(item);
             }
         }
         public List<Item> GetOwnedItems()
         {
             // 구매한 아이템만 리턴
-            return inventory.Where(i => i.isPurchased).ToList();
+            return _inventory.Where(i => i.IsPurchased).ToList();
         }
 
     }

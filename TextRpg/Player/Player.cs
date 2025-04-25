@@ -173,7 +173,7 @@ namespace TextRpg
         {
             get
             {
-                float weaponBonus = EquippedWeapon is Weapon w ? w.attack : 0;
+                float weaponBonus = EquippedWeapon is Weapon w ? w.Attack : 0;
                 return power + weaponBonus;
             }
         }
@@ -182,7 +182,7 @@ namespace TextRpg
         {
             get
             {
-                int armorBonus = EquippedArmor is Armor a ? a.defense : 0;
+                int armorBonus = EquippedArmor is Armor a ? a.Defense : 0;
                 return defense + armorBonus;
             }
         }
@@ -235,8 +235,8 @@ namespace TextRpg
                 equipmentTable.AddColumn(new TableColumn("[yellow]장비 타입[/]").Centered());
                 
                 // 장비 테이블에 행 추가
-                equipmentTable.AddRow("[cyan]장착 무기[/]", $"{(EquippedWeapon != null ? EquippedWeapon.itemName : "없음")}");
-                equipmentTable.AddRow("[cyan]장착 방어구[/]", $"{(EquippedArmor != null ? EquippedArmor.itemName : "없음")}");
+                equipmentTable.AddRow("[cyan]장착 무기[/]", $"{(EquippedWeapon != null ? EquippedWeapon.ItemName : "없음")}");
+                equipmentTable.AddRow("[cyan]장착 방어구[/]", $"{(EquippedArmor != null ? EquippedArmor.ItemName : "없음")}");
                 AnsiConsole.Write(equipmentTable);
                 
                 var skillTable = new Table();

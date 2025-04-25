@@ -7,7 +7,7 @@ using Spectre.Console;
 
 namespace TextRpg
 {
-    public static class Spectre_Ex
+    public static class SpectreExample
     {
         public static void Print_Spectre_Examples()
         {

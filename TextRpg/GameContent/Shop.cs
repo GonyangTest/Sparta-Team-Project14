@@ -49,7 +49,7 @@ namespace TextRpg
             {
                 Console.Clear();
                 Console.WriteLine("상점\n필요한 아이템을 얻을 수 있는 상점입니다.\n");
-                Console.WriteLine($"[보유 골드]\n{_player.gold}\n");
+                Console.WriteLine($"[보유 골드]\n{_player.gold} G\n");
                 Console.WriteLine("[아이템 목록]\n");
                 foreach (Item item in items)
                 {
@@ -86,7 +86,7 @@ namespace TextRpg
             {
                 Console.Clear();
                 Console.WriteLine("상점\n번호를 눌러 아이템을 구매하세요.\n");
-                Console.WriteLine($"[보유 골드]\n{_player.gold}\n");
+                Console.WriteLine($"[보유 골드]\n{_player.gold} G\n");
                 Console.WriteLine("[아이템 목록]");
 
                 var choice = AnsiConsole.Prompt(

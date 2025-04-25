@@ -13,7 +13,7 @@ namespace TextRpg
         private const string SAVE_FILE_PATH = "save_data.json";
 
         // 게임 데이터 저장
-        public static void SaveGame(Player player, Inventory inventory, Quest quest)
+        public static void SaveGame(Player player, Inventory inventory, Quest quest, Shop shop)
         {
             try
             {
@@ -39,6 +39,9 @@ namespace TextRpg
                 // 퀘스트 데이터 저장
                 gameData.QuestData.FromQuest(quest);
 
+                // Shop의 아이템들을 저장
+                gameData.ShopData.FromShop(shop);
+
                 // JSON 직렬화 설정
                 var options = new JsonSerializerOptions
                 {
@@ -59,7 +62,7 @@ namespace TextRpg
         }
 
         // 게임 데이터 불러오기
-        public static bool LoadGame(Player player, Inventory inventory, Quest quest)
+        public static bool LoadGame(Player player, Inventory inventory, Quest quest, Shop shop)
         {
             if (!File.Exists(SAVE_FILE_PATH))
             {
@@ -101,6 +104,10 @@ namespace TextRpg
 
                 // 퀘스트 데이터 적용
                 gameData.QuestData.ToQuest(quest);
+                quest.LoadQuestData();
+
+                // 상점 데이터 적용
+                gameData.ShopData.ToShop(shop);
 
                 Console.WriteLine($"{player.playerName}의 게임 데이터를 성공적으로 불러왔습니다.");
                 return true;

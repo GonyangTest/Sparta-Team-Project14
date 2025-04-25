@@ -2,6 +2,7 @@
 using TextRpg;
 using System.Text;
 using Spectre.Console;
+using System.Numerics;
 
 internal class Program
 {
@@ -9,6 +10,8 @@ internal class Program
     internal static Player player = new Player();
     internal static Inventory inventory = new Inventory();
     internal static Quest quest = new Quest();
+    internal static Shop shop;
+    
 
     static void Main(string[] args)
     {
@@ -38,7 +41,8 @@ internal class Program
                 case 0:
                     break;
                 case 1:
-                    bool loaded = SaveLoadManager.LoadGame(player, inventory, quest);
+                    shop ??= new Shop(player);
+                    bool loaded = SaveLoadManager.LoadGame(player, inventory, quest, shop);
                     if (loaded)
                     {
                         Console.WriteLine("저장된 게임을 성공적으로 불러왔습니다.");
@@ -60,11 +64,12 @@ internal class Program
         {
             Console.WriteLine("저장된 게임 파일이 없습니다. 새로운 게임을 시작합니다.");
             player.SetPlayer();  // 새로운 게임 시작
+            shop = new Shop(player);
         }
 
         // 게임 진행
         Town town = new Town();
-        Shop shop = new Shop(player);
+        shop ??= new Shop(player);
         Dungeon dungeon = new Dungeon();
         Rest rest = new Rest();
 

@@ -89,7 +89,7 @@ namespace TextRpg
                         Program.quest.PrintQuestList();
                         break;
                     case 7:
-                        SaveLoadManager.SaveGame(player, inventory, quest);
+                        SaveLoadManager.SaveGame(player, inventory, quest, shop);
                         Console.WriteLine("계속하려면 아무 키나 누르세요...");
                         Console.ReadKey();
                         break;

@@ -8,6 +8,11 @@ using System.Threading.Tasks;
 using Spectre.Console;
 namespace TextRpg
 {
+    public enum SkillType
+    {
+        Single,
+        AoE
+    }
 
     public class Job
     {
@@ -49,25 +54,27 @@ namespace TextRpg
         public string Name;
         public float PowerMultiplier;
         public int ManaCost;
+        public SkillType Type;
 
-        public Skill(string job, string name, float powerMultiplier, int manaCost)
+        public Skill(string job, string name, float powerMultiplier, int manaCost, SkillType type)
         {
             Job = job;
             Name = name;
             PowerMultiplier = powerMultiplier;
             ManaCost = manaCost;
+            Type = type;
         }
 
         public static Dictionary<int, Skill> SkillList = new Dictionary<int, Skill>()
         {
-            {1, new Skill("전사", "강타", 2f, 10) },
-            {2, new Skill("전사", "대지의분노", 1.5f, 20) },
-            {3, new Skill("도적", "기습", 2f, 10) },
-            {4, new Skill("도적", "그림자 춤", 1.5f, 20) },
-            {5, new Skill("궁수", "더블샷", 2f, 10) },
-            {6, new Skill("궁수", "화살비", 1.5f, 20) },
-            {7, new Skill("마법사", "파이어볼", 2f, 10) },
-            {8, new Skill("마법사", "메테오", 1.5f, 20) }
+            {1, new Skill("전사", "강타", 2f, 10, SkillType.Single) },
+            {2, new Skill("전사", "대지의분노", 1.5f, 20, SkillType.AoE) },
+            {3, new Skill("도적", "기습", 2f, 10, SkillType.Single) },
+            {4, new Skill("도적", "그림자 춤", 1.5f, 20, SkillType.AoE) },
+            {5, new Skill("궁수", "더블샷", 2f, 10, SkillType.Single) },
+            {6, new Skill("궁수", "화살비", 1.5f, 20, SkillType.AoE) },
+            {7, new Skill("마법사", "파이어볼", 2f, 10, SkillType.Single) },
+            {8, new Skill("마법사", "메테오", 1.5f, 20, SkillType.AoE) }
         };
     }
 

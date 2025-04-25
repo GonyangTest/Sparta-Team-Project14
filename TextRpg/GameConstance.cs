@@ -12,7 +12,6 @@ namespace TextRpg
         public static class Player
         {
             public const int INITIAL_GOLD = 10000;
-            public const int INITIAL_HEALTH = 100;
             public const int INITIAL_EXP = 0;
             public const int INITIAL_LEVEL = 1;
             public const int INITIAL_MAX_EXP = 10;
@@ -30,16 +29,7 @@ namespace TextRpg
         }
 
         public static class Skill
-        {
-            public const int WARRIOR_SKILL_1_MANA_COST = 10;
-            public const int WARRIOR_SKILL_2_MANA_COST = 20;
-            public const int THIEF_SKILL_1_MANA_COST = 10;
-            public const int THIEF_SKILL_2_MANA_COST = 20;
-            public const int ARCHER_SKILL_1_MANA_COST = 10;
-            public const int ARCHER_SKILL_2_MANA_COST = 20;
-            public const int MAGE_SKILL_1_MANA_COST = 10;
-            public const int MAGE_SKILL_2_MANA_COST = 20;
-            
+        {  
             // 스킬 데미지 배율
             public const float SKILL_SINGLE_POWER_MULTIPLIER = 2.0f;
             public const float SKILL_AOE_POWER_MULTIPLIER = 1.5f;
@@ -62,10 +52,6 @@ namespace TextRpg
 
         public static class Battle
         {
-            // 회피 확률
-            public const int EVASION_CHANCE = 10;
-            // 치명타 확률
-            public const int CRITICAL_CHANCE = 15; // NOTE: 플레이어 치명타 확률로 계산할지?
             // 치명타 데미지 배율
             public const float CRITICAL_DAMAGE_MULTIPLIER = 1.6f;
             // 최소 데미지
@@ -78,6 +64,13 @@ namespace TextRpg
             public const int SLEEP_AFTER_DEATH = 2000;
             // 던전 나가기 전 대기 시간
             public const int SLEEP_DUNGEON_EXIT = 1000;
+        }
+
+        public static class Monster
+        {
+
+            // 회피 확률
+            public const int EVASION_CHANCE = 10;
         }
         
         public static class Dungeon

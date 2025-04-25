@@ -73,8 +73,7 @@ namespace TextRpg
                     case 1:
                         Console.Clear();
                         AnsiConsole.MarkupLine(Markup.Escape(player.PrintPlayer()));
-                        AnsiConsole.MarkupLine("\n0. 나가기");
-                        Console.ReadLine();
+                        AnsiConsole.Prompt(new SelectionPrompt<string>().AddChoices("나가기\n"));
                         break;
                     case 2:
                         inventory.ShowInventory(player);

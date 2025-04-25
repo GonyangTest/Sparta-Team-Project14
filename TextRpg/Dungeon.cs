@@ -34,6 +34,7 @@ namespace TextRpg
                         Console.ReadLine();
                         break;
                     case "2":
+                        SoundManager.Instance.StopMusic();
                         EnterDungeon(player);
                         break;
                     case "0":
@@ -47,6 +48,7 @@ namespace TextRpg
         }
         private void EnterDungeon(Player player)
         {
+            SoundManager.Instance.StartDungeonMusic();
             Console.Clear();
             List<Stage> stages = new List<Stage>();
             int[] floor = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
@@ -67,6 +69,8 @@ namespace TextRpg
                     {
                         Console.WriteLine("플레이어가 사망했습니다. 던전에서 퇴장합니다...");
                         Thread.Sleep(2000);
+                        SoundManager.Instance.StopMusic();
+                        SoundManager.Instance.StartMainMusic();
                         break;
                     }
 
@@ -74,6 +78,8 @@ namespace TextRpg
                     {
                         Console.WriteLine("스테이지 클리어에 실패했습니다...");
                         Thread.Sleep(2000);
+                        SoundManager.Instance.StopMusic();
+                        SoundManager.Instance.StartMainMusic();
                         break;
                     }
 
@@ -89,6 +95,8 @@ namespace TextRpg
                     {
                         Console.WriteLine("던전을 떠납니다...");
                         Thread.Sleep(1000);
+                        SoundManager.Instance.StopMusic();
+                        SoundManager.Instance.StartMainMusic();
                         break;
                     }
                 }

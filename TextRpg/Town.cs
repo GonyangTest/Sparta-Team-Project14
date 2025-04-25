@@ -31,6 +31,8 @@ namespace TextRpg
 
         public void TownMap(Player player, Inventory inventory, Shop shop, Dungeon dungeon, Rest rest, Quest quest)
         {
+            SoundManager.Instance.StartMainMusic();
+
             bool isExit = true;
             while (isExit)
             {

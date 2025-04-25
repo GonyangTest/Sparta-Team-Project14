@@ -8,84 +8,15 @@ using System.Threading.Tasks;
 using Spectre.Console;
 namespace TextRpg
 {
-    public enum SkillType
-    {
-        Single,
-        AoE
-    }
-
-    public class Job
-    {
-        public string Name;
-        public int Hp;
-        public int Mana;
-        public int MaxHp;
-        public int MaxMp;
-        public float Power;
-        public int Defense;
-        public int Agility;
-        public int CriticalChance;
-
-        public Job(string name, int hp, int mana, int maxHp, int maxMp, float power, int defense, int agility, int criticalChance)
-        {
-            Name = name;
-            Hp = hp;
-            Mana = mana;
-            MaxHp = maxHp;
-            MaxMp = maxMp;
-            Power = power;
-            Defense = defense;
-            Agility = agility;
-            CriticalChance = criticalChance;
-        }
-
-        public static Dictionary<int, Job> JobList = new Dictionary<int, Job>()
-        {
-            {1, new Job("전사", 150, 80, 150, 80, 8f, 6, 5, 5)},
-            {2, new Job("도적", 100, 100, 100, 100, 4f, 5, 20, 20)},
-            {3, new Job("궁수", 100, 100, 100, 100, 6f, 5, 10, 10)},
-            {4, new Job("마법사", 80, 150, 80, 150, 7f, 4, 5, 10)}
-        };
-    }
-
-    public class Skill
-    {
-        public string Job;
-        public string Name;
-        public float PowerMultiplier;
-        public int ManaCost;
-        public SkillType Type;
-
-        public Skill(string job, string name, float powerMultiplier, int manaCost, SkillType type)
-        {
-            Job = job;
-            Name = name;
-            PowerMultiplier = powerMultiplier;
-            ManaCost = manaCost;
-            Type = type;
-        }
-
-        public static Dictionary<int, Skill> SkillList = new Dictionary<int, Skill>()
-        {
-            {1, new Skill("전사", "강타", 2f, 10, SkillType.Single) },
-            {2, new Skill("전사", "대지의분노", 1.5f, 20, SkillType.AoE) },
-            {3, new Skill("도적", "기습", 2f, 10, SkillType.Single) },
-            {4, new Skill("도적", "그림자 춤", 1.5f, 20, SkillType.AoE) },
-            {5, new Skill("궁수", "더블샷", 2f, 10, SkillType.Single) },
-            {6, new Skill("궁수", "화살비", 1.5f, 20, SkillType.AoE) },
-            {7, new Skill("마법사", "파이어볼", 2f, 10, SkillType.Single) },
-            {8, new Skill("마법사", "메테오", 1.5f, 20, SkillType.AoE) }
-        };
-    }
 
     class Player
     {
         public string playerName;
         public string playerClass;
-        public int level = 1;
-        public int exp = 0;
-        public int maxExp = 10;
-        public int gold = 10000;
+        public int level = GameConstance.Player.INITIAL_LEVEL;
+        public int exp = GameConstance.Player.INITIAL_EXP;
+        public int maxExp = GameConstance.Player.INITIAL_MAX_EXP;
+        public int gold = GameConstance.Player.INITIAL_GOLD;
         public int hp;
         public int mana;
         public int maxHp;
@@ -101,9 +32,6 @@ namespace TextRpg
 
         public Item EquippedWeapon;
         public Item EquippedArmor;
-
-        // 체력 포션 사용
-
 
         public void SetPlayer()
         {
@@ -168,6 +96,7 @@ namespace TextRpg
             index = int.Parse(choice.Split('.')[0]);
 
             SelectedJob = Job.JobList[index];
+            // TODO: 나중에 구조 변경 필요
             playerClass = SelectedJob.Name;
             hp = SelectedJob.Hp;
             mana = SelectedJob.Mana;
@@ -229,8 +158,8 @@ namespace TextRpg
                 maxExp += increase;
 
                 // 레벨업시 공격력 0.5증가 방어력 1증가
-                power += 0.5f;
-                defense += 1;
+                power += GameConstance.Player.LEVEL_UP_POWER_INCREASE;
+                defense += GameConstance.Player.LEVEL_UP_DEFENSE_INCREASE;
 
                 // 레벨 달성 퀘스트 판정
                 Program.quest.QuestRenewal(2, level);
@@ -265,7 +194,7 @@ namespace TextRpg
         //크리티컬 데미지
         public int CriticalDamage()
         {
-            int criticalDamage = (int)(totalPower * 1.6);
+            int criticalDamage = (int)(totalPower * GameConstance.Player.CRITICAL_DAMAGE_MULTIPLIER);
             return criticalDamage;
         }
 
@@ -286,7 +215,8 @@ namespace TextRpg
                 $"치명타확률: {criticalChance}\n" +
                 $"장착 무기: {(EquippedWeapon != null ? EquippedWeapon.itemName : "없음")}\n" +
                 $"장착 방어구: {(EquippedArmor != null ? EquippedArmor.itemName : "없음")}\n" +
-                $"골드 : {gold} G\n";
+                $"골드 : {gold} G\n" +
+                $"[스킬목록]\n{string.Join("\n", SkillFactory.GetSkillsByJob(playerClass).Select(skill => skill.ToString()))}";
         }
     }
 }

@@ -73,8 +73,7 @@ namespace TextRpg
                     case 1:
                         Console.Clear();
                         AnsiConsole.MarkupLine(Markup.Escape(player.PrintPlayer()));
-                        AnsiConsole.MarkupLine("\n0. 나가기");
-                        Console.ReadLine();
+                        AnsiConsole.Prompt(new SelectionPrompt<string>().AddChoices("나가기\n"));
                         break;
                     case 2:
                         inventory.ShowInventory(player);
@@ -92,7 +91,7 @@ namespace TextRpg
                         Program.quest.PrintQuestList();
                         break;
                     case 7:
-                        SaveLoadManager.SaveGame(player, inventory, quest);
+                        SaveLoadManager.SaveGame(player, inventory, quest, shop);
                         Console.WriteLine("계속하려면 아무 키나 누르세요...");
                         Console.ReadKey();
                         break;

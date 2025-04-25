@@ -61,7 +61,17 @@ namespace TextRpg
 
                 for (int i = 1; i <= floor.Length; i++)
                 {
-                    stages.Add(new Stage($"{i}단계", normalCount: 1, eliteCount: 1, bossCount: 1));
+                    //stages.Add(new Stage($"{i}단계",normalCount: 1, eliteCount: 1, bossCount: 1));
+                    stages.Add(new Stage("1단계", new Dictionary<string, int> { { "1", 3 } }));
+                    stages.Add(new Stage("2단계", new Dictionary<string, int> { { "1", 2 }, { "2", 1 } }));
+                    stages.Add(new Stage("3단계", new Dictionary<string, int> { { "2", 2 }, { "3", 1 } }));
+                    stages.Add(new Stage("4단계", new Dictionary<string, int> { { "3", 2 }, { "4", 1 } }));
+                    stages.Add(new Stage("5단계", new Dictionary<string, int> { { "4", 2 }, { "5", 1 } }));
+                    stages.Add(new Stage("6단계", new Dictionary<string, int> { { "5", 2 }, { "6", 1 } }));
+                    stages.Add(new Stage("7단계", new Dictionary<string, int> { { "6", 2 }, { "7", 1 } }));
+                    stages.Add(new Stage("8단계", new Dictionary<string, int> { { "7", 2 }, { "8", 1 } }));
+                    stages.Add(new Stage("9단계", new Dictionary<string, int> { { "8", 2 }, { "9", 1 } }));
+                    stages.Add(new Stage("10단계", new Dictionary<string, int> { { "8", 1 }, { "9", 1 }, { "10", 1 } }));
                 }
 
                 foreach (Stage stage in stages)
@@ -120,7 +130,7 @@ namespace TextRpg
 
         private static bool monstersLoaded = false;//
 
-        public Stage(string name, int normalCount, int eliteCount, int bossCount)
+        public Stage(string name, Dictionary<string, int> monsterConfig)
         {
             if (!monstersLoaded)
             {
@@ -131,19 +141,15 @@ namespace TextRpg
             }
 
             Name = name;
-
             Monsters = new List<Monster>();
 
-            for (int i = 0; i < normalCount; i++)
-                Monsters.Add(MonsterFactory.Create($"1"));
-
-            for (int i = 0; i < eliteCount; i++)
-                Monsters.Add(MonsterFactory.Create("2"));
-
-            for (int i = 0; i < bossCount; i++)
-                Monsters.Add(MonsterFactory.Create("3"));
-
-            Cleared = false;
+            foreach (var entry in monsterConfig)
+            {
+                for (int i = 0; i < entry.Value; i++)
+                {
+                    Monsters.Add(MonsterFactory.Create(entry.Key));
+                }
+            }
         }
 
         internal void Start(Player player)
@@ -171,9 +177,17 @@ namespace TextRpg
             {
                 // Start() 내부에 있던 클리어 판정 구문을 여기로 이동
                 // 조건 수정: 플레이어 패배 or 몬스터가 모두 사망한 상태
-                if (player.hp <= 0 || Monsters.All(m => m.IsAlive == false))
+                /*if (player.hp <= 0 || Monsters.All(m => m.IsAlive == false))
                 {
                     Cleared = true;
+                    break;
+                }*/ 
+
+                // 윗부분 잠시 주석처리했습니다. 오류나면 알려주세요
+
+                if (monsters.All(m => m.CurrentHP <= 0))
+                {
+                    // 모든 몬스터가 죽었으면 전투 종료하고 결과 화면으로 바로 넘어감
                     break;
                 }
 
@@ -344,10 +358,8 @@ namespace TextRpg
         {
 
             Random rand = new Random();//플레이어에게 크리티컬 확률이없어 일시적으로 추가
-            int crit = 15;// 22
-            int eva = 10;
-            crit = rand.Next(1, 101);
-            eva = rand.Next(1, 101);
+            int crit = rand.Next(1, 101);
+            int eva = rand.Next(1, 101);
 
             Console.Clear();
             Console.WriteLine("=== 공격할 대상을 선택하세요 ===\n");
@@ -397,7 +409,7 @@ namespace TextRpg
             }
             else
             {
-                bool isCritical = crit <= 15;
+                bool isCritical = crit <= player.criticalChance;
                 int finalDamage = isCritical ? (int)(damage * 1.6) : damage;
                 target.Hit(finalDamage);
 
@@ -417,6 +429,14 @@ namespace TextRpg
             Console.ReadLine();
 
             // 살아있는 몬스터들의 반격
+            if (monsters.All(m => m.CurrentHP <= 0))
+            {
+                Console.Clear();
+                Console.WriteLine("모든 몬스터를 처치했습니다!");
+                Console.ReadKey();
+                return; // 함수 종료
+            }
+
             Console.Clear();
             MonsterCounterAttack(player, monsters);
         }
@@ -498,8 +518,16 @@ namespace TextRpg
             Console.WriteLine(">>");
             Console.ReadKey();
             Console.Clear();
-            MonsterCounterAttack(player, monsters);
 
+            if (monsters.All(m => m.CurrentHP <= 0))
+            {
+                Console.Clear();
+                Console.WriteLine("모든 몬스터를 처치했습니다!");
+                Console.ReadKey();
+                return; // 함수 종료
+            }
+
+            MonsterCounterAttack(player, monsters);
 
         }
 

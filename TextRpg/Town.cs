@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -28,7 +29,7 @@ namespace TextRpg
                                         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ";
 
-        public void TownMap(Player player, Inventory inventory, Shop shop, Dungeon dungeon, Rest rest)
+        public void TownMap(Player player, Inventory inventory, Shop shop, Dungeon dungeon, Rest rest, Quest quest)
         {
             bool isExit = true;
             while (isExit)
@@ -46,6 +47,7 @@ namespace TextRpg
                     "4. 던전입장",
                     "5. 휴식하기",
                     "6. 퀘스트",
+                    "7. 저장하기",
                     "0. 게임종료"
                 };
 
@@ -85,6 +87,11 @@ namespace TextRpg
                         break;
                     case 6:
                         Program.quest.PrintQuestList();
+                        break;
+                    case 7:
+                        SaveLoadManager.SaveGame(player, inventory, quest);
+                        Console.WriteLine("계속하려면 아무 키나 누르세요...");
+                        Console.ReadKey();
                         break;
                 }
             }

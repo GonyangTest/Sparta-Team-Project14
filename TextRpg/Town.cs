@@ -53,7 +53,8 @@ namespace TextRpg
                 new SelectionPrompt<string>()
                     .Title("원하시는 [green]행동[/]을 선택해주세요.")
                     .PageSize(10)
-                    .AddChoices(menu));
+                    .AddChoices(menu)
+                    .WrapAround());
 
                 int index = int.Parse(choice.Split('.')[0]);
 

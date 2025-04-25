@@ -12,17 +12,18 @@ namespace TextRpg
     class Dungeon
     {
         Random rand = new Random();
+        private List<Stage> _stages;
 
         public void EnterDungeonMenu(Player player)
         {
             while (true)
             {
                 Console.Clear();
-                Console.WriteLine("**던전입장**");
-                Console.WriteLine("이곳에서 던전으로 들어가기전 활동을 할 수 있습니다.\n");
-                Console.WriteLine("1. 상태 보기");
-                Console.WriteLine("2. 전투 시작");
-                Console.WriteLine("0. 나가기\n");
+                AnsiConsole.MarkupLine("**던전입장**");
+                AnsiConsole.MarkupLine("이곳에서 던전으로 들어가기전 활동을 할 수 있습니다.\n");
+                AnsiConsole.MarkupLine("1. 상태 보기");
+                AnsiConsole.MarkupLine("2. 전투 시작");
+                AnsiConsole.MarkupLine("0. 나가기\n");
                 Console.Write("원하시는 행동을 입력해주세요.\n>> ");
 
                 string input = Console.ReadLine();
@@ -31,8 +32,8 @@ namespace TextRpg
                 {
                     case "1":
                         Console.Clear();
-                        Console.WriteLine(player.PrintPlayer());
-                        Console.WriteLine("\n0. 나가기");
+                        AnsiConsole.MarkupLine(player.PrintPlayer());
+                        AnsiConsole.MarkupLine("\n0. 나가기");
                         Console.ReadLine();
                         break;
                     case "2":
@@ -42,7 +43,7 @@ namespace TextRpg
                     case "0":
                         return;
                     default:
-                        Console.WriteLine("잘못된 입력입니다.");
+                        AnsiConsole.MarkupLine("잘못된 입력입니다.");
                         Console.ReadKey();
                         break;
                 }
@@ -52,34 +53,35 @@ namespace TextRpg
         {
             SoundManager.Instance.StartDungeonMusic();
             Console.Clear();
-            List<Stage> stages = new List<Stage>();
-            int[] floor = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
-            try
-            {
-                Console.Clear();
-                Console.WriteLine("Battle");
+            _stages = new List<Stage>();
+            int maxStage = GameConstance.Dungeon.MAX_STAGE;
 
-                for (int i = 1; i <= floor.Length; i++)
+            // try
+            // {
+                Console.Clear();
+                AnsiConsole.MarkupLine("Battle");
+
+                for (int i = 1; i <= maxStage; i++)
                 {
-                    //stages.Add(new Stage($"{i}단계",normalCount: 1, eliteCount: 1, bossCount: 1));
-                    stages.Add(new Stage("1단계", new Dictionary<string, int> { { "1", 3 } }));
-                    stages.Add(new Stage("2단계", new Dictionary<string, int> { { "1", 2 }, { "2", 1 } }));
-                    stages.Add(new Stage("3단계", new Dictionary<string, int> { { "2", 2 }, { "3", 1 } }));
-                    stages.Add(new Stage("4단계", new Dictionary<string, int> { { "3", 2 }, { "4", 1 } }));
-                    stages.Add(new Stage("5단계", new Dictionary<string, int> { { "4", 2 }, { "5", 1 } }));
-                    stages.Add(new Stage("6단계", new Dictionary<string, int> { { "5", 2 }, { "6", 1 } }));
-                    stages.Add(new Stage("7단계", new Dictionary<string, int> { { "6", 2 }, { "7", 1 } }));
-                    stages.Add(new Stage("8단계", new Dictionary<string, int> { { "7", 2 }, { "8", 1 } }));
-                    stages.Add(new Stage("9단계", new Dictionary<string, int> { { "8", 2 }, { "9", 1 } }));
-                    stages.Add(new Stage("10단계", new Dictionary<string, int> { { "8", 1 }, { "9", 1 }, { "10", 1 } }));
+                    _stages.Add(new Stage($"{i}단계", MonsterFactory.Create(i)));
+                    // stages.Add(new Stage("1단계", new Dictionary<string, int> { { "1", 3 } }));
+                    // stages.Add(new Stage("2단계", new Dictionary<string, int> { { "1", 2 }, { "2", 1 } }));
+                    // stages.Add(new Stage("3단계", new Dictionary<string, int> { { "2", 2 }, { "3", 1 } }));
+                    // stages.Add(new Stage("4단계", new Dictionary<string, int> { { "3", 2 }, { "4", 1 } }));
+                    // stages.Add(new Stage("5단계", new Dictionary<string, int> { { "4", 2 }, { "5", 1 } }));
+                    // stages.Add(new Stage("6단계", new Dictionary<string, int> { { "5", 2 }, { "6", 1 } }));
+                    // stages.Add(new Stage("7단계", new Dictionary<string, int> { { "6", 2 }, { "7", 1 } }));
+                    // stages.Add(new Stage("8단계", new Dictionary<string, int> { { "7", 2 }, { "8", 1 } }));
+                    // stages.Add(new Stage("9단계", new Dictionary<string, int> { { "8", 2 }, { "9", 1 } }));
+                    // stages.Add(new Stage("10단계", new Dictionary<string, int> { { "8", 1 }, { "9", 1 }, { "10", 1 } }));
                 }
 
-                foreach (Stage stage in stages)
+                foreach (Stage stage in _stages)
                 {
                     stage.Start(player);
                     if (player.hp <= 0)
                     {
-                        Console.WriteLine("플레이어가 사망했습니다. 던전에서 퇴장합니다...");
+                        AnsiConsole.MarkupLine("플레이어가 사망했습니다. 던전에서 퇴장합니다...");
                         Thread.Sleep(2000);
                         SoundManager.Instance.StopMusic();
                         SoundManager.Instance.StartMainMusic();
@@ -88,7 +90,7 @@ namespace TextRpg
 
                     if (!stage.Cleared)
                     {
-                        Console.WriteLine("스테이지 클리어에 실패했습니다...");
+                        AnsiConsole.MarkupLine("스테이지 클리어에 실패했습니다...");
                         Thread.Sleep(2000);
                         SoundManager.Instance.StopMusic();
                         SoundManager.Instance.StartMainMusic();
@@ -97,15 +99,15 @@ namespace TextRpg
 
                     // 다음 스테이지로 진행 여부
                     Console.Clear();
-                    Console.WriteLine($"현재까지 {stage.Name} 스테이지 클리어!");
-                    Console.WriteLine("1. 다음 스테이지 도전");
-                    Console.WriteLine("0. 마을로 돌아가기");
+                    AnsiConsole.MarkupLine($"현재까지 {stage.Name} 스테이지 클리어!");
+                    AnsiConsole.MarkupLine("1. 다음 스테이지 도전");
+                    AnsiConsole.MarkupLine("0. 마을로 돌아가기");
                     Console.Write("\n선택 >> ");
                     string input = Console.ReadLine();
 
                     if (input == "0")
                     {
-                        Console.WriteLine("던전을 떠납니다...");
+                        AnsiConsole.MarkupLine("던전을 떠납니다...");
                         Thread.Sleep(1000);
                         SoundManager.Instance.StopMusic();
                         SoundManager.Instance.StartMainMusic();
@@ -113,12 +115,12 @@ namespace TextRpg
                     }
                 }
 
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"[에러 발생] {ex.Message}");
-                Console.ReadKey();
-            }
+            // }
+            // catch (Exception ex)
+            // {
+            //     AnsiConsole.MarkupLine($"[[에러 발생]] {ex.Message}");
+            //     Console.ReadKey();
+            // }
 
         }
     }
@@ -126,46 +128,42 @@ namespace TextRpg
     {
         public string Name { get; private set; }//던전이름
         public List<Monster> Monsters { get; private set; }//몬스터 리스트
-        public bool Cleared { get; private set; }//클리어유무판독
+        private bool _cleared = false;
 
-        private static bool monstersLoaded = false;//
+        public bool Cleared { 
+            get { return _cleared; }
+         }
 
-        public Stage(string name, Dictionary<string, int> monsterConfig)
+        // private static bool monstersLoaded = false;//
+
+        public Stage(string name, List<Monster> monsters)
         {
-            if (!monstersLoaded)
-            {
-                string filePath = @"..\..\..\monsters.csv";
-                //상대경로 수정필요
-                MonsterFactory.LoadMonsters(filePath);
-                monstersLoaded = true;
-            }
+            // if (!monstersLoaded)
+            // {
+            //     string filePath = @"..\..\..\monsters.csv";
+            //     //상대경로 수정필요
+            //     MonsterFactory.LoadMonsters(filePath);
+            //     monstersLoaded = true;
+            // }
 
             Name = name;
-            Monsters = new List<Monster>();
-
-            foreach (var entry in monsterConfig)
-            {
-                for (int i = 0; i < entry.Value; i++)
-                {
-                    Monsters.Add(MonsterFactory.Create(entry.Key));
-                }
-            }
+            Monsters = monsters;
         }
 
         internal void Start(Player player)
         {
-            Console.WriteLine($"=== {Name} 스테이지 시작 ===");
+            AnsiConsole.MarkupLine($"=== {Name} 스테이지 시작 ===");
 
             foreach (Monster monster in Monsters)
             {
-                Console.WriteLine(monster);
+                AnsiConsole.MarkupLine(monster.ToString());
 
             }
 
             Battle(player, Monsters);
 
 
-            Console.WriteLine("계속하려면 아무 키나 누르세요...");
+            AnsiConsole.MarkupLine("계속하려면 아무 키나 누르세요...");
             Console.ReadKey();
         }
 
@@ -192,20 +190,20 @@ namespace TextRpg
                 }
 
                 Console.Clear();
-                Console.WriteLine("Battle!!\n");
+                AnsiConsole.MarkupLine("Battle!!\n");
 
                 // 몬스터 목록 출력
                 for (int i = 0; i < monsters.Count; i++)
                 {
                     var m = monsters[i];
                     string status = m.IsAlive ? $"HP {m.CurrentHP}" : "Dead";
-                    Console.WriteLine($"{i + 1}. Lv.{m.Level} {m.Name}  {status}");
+                    AnsiConsole.MarkupLine($"{i + 1}. Lv.{m.Level} {m.Name}  {status}");
                 }
 
-                Console.WriteLine("\n[내정보]");
-                Console.WriteLine($"Lv.{player.level} {player.playerName} ({player.playerClass})");
-                Console.WriteLine($"HP {player.hp}/{player.maxHp}\n");
-                Console.WriteLine($"MP {player.mana}/{player.maxMp}\n");
+                AnsiConsole.MarkupLine("\n[[내정보]]");
+                AnsiConsole.MarkupLine($"Lv.{player.level} {player.playerName} ({player.playerClass})");
+                AnsiConsole.MarkupLine($"HP {player.hp}/{player.maxHp}\n");
+                AnsiConsole.MarkupLine($"MP {player.mana}/{player.maxMp}\n");
 
                 string[] battleMenus = new string[] { "1. 기본 공격", "2. 스킬 공격\n", "0. 도망" };
 
@@ -254,6 +252,8 @@ namespace TextRpg
             // 처치한 몬스터에 따라 얻은 골드, 경험치 계산
             if (player.hp > 0)
             {
+                _cleared = true;
+
                 int gold = 0,
                     increasePerLoop_gold = 0,
                     exp = 0,
@@ -261,7 +261,7 @@ namespace TextRpg
                     resultLoopCount = 0;
 
                 panelHeader += "[green]Victory[/]";
-                Console.WriteLine($"던전에서 몬스터 {monsters.Count}마리를 잡았습니다.");
+                AnsiConsole.MarkupLine($"던전에서 몬스터 {monsters.Count}마리를 잡았습니다.");
 
                 // 모든 몬스터를 잡았기에 몬스터 수 전체를 잡은 수에 추가
                 killCount = monsters.Count;
@@ -299,7 +299,7 @@ namespace TextRpg
                     // 드랍 아이템... 없다??? 없으면 아이템은 빼기
 
                     Console.Clear();
-                    Console.WriteLine("Battle!! = Result\n");
+                    AnsiConsole.MarkupLine("Battle!! = Result\n");
                     var panel = new Panel(inPanel); // 패널 생성 및 안에 들어갈 내용 
                                                     // 테두리 스타일(Rounded, Square, Ascii, None 등) Double, Heavy는 제대로 출력이 안되는 듯함
                     panel.Border = BoxBorder.Rounded;
@@ -327,7 +327,7 @@ namespace TextRpg
                 $"MP {player.mana}/{player.maxMp}";
 
                 Console.Clear();
-                Console.WriteLine("Battle!! = Result\n");
+                AnsiConsole.MarkupLine("Battle!! = Result\n");
                 var panel = new Panel(inPanel); // 패널 생성 및 안에 들어갈 내용 
                                                 // 테두리 스타일(Rounded, Square, Ascii, None 등) Double, Heavy는 제대로 출력이 안되는 듯함
                 panel.Border = BoxBorder.Rounded;
@@ -351,7 +351,7 @@ namespace TextRpg
             Program.quest.QuestRenewal(0, killCount);
 
 
-            Console.WriteLine("\n0. 다음\n>>");
+            AnsiConsole.MarkupLine("\n0. 다음\n>>");
             Console.ReadLine();
         }
         private void BasicAttack(Player player, List<Monster> monsters)
@@ -362,17 +362,17 @@ namespace TextRpg
             int eva = rand.Next(1, 101);
 
             Console.Clear();
-            Console.WriteLine("=== 공격할 대상을 선택하세요 ===\n");
+            AnsiConsole.MarkupLine("=== 공격할 대상을 선택하세요 ===\n");
 
             // 몬스터 리스트 출력
             for (int i = 0; i < monsters.Count; i++)
             {
                 var m = monsters[i];
                 string status = m.CurrentHP <= 0 ? "Dead" : $"HP {m.CurrentHP}";
-                Console.WriteLine($"{i + 1}. Lv.{m.Level} {m.Name} - {status}");
+                AnsiConsole.MarkupLine($"{i + 1}. Lv.{m.Level} {m.Name} - {status}");
             }
 
-            Console.WriteLine("\n0. 취소");
+            AnsiConsole.MarkupLine("\n0. 취소");
             Console.Write(">> ");
             string input = Console.ReadLine();
 
@@ -380,7 +380,7 @@ namespace TextRpg
 
             if (!int.TryParse(input, out int index) || index < 1 || index > monsters.Count)
             {
-                Console.WriteLine("잘못된 입력입니다.");
+                AnsiConsole.MarkupLine("잘못된 입력입니다.");
                 Console.ReadKey();
                 return;
             }
@@ -389,13 +389,13 @@ namespace TextRpg
 
             if (!target.IsAlive)
             {
-                Console.WriteLine("이미 쓰러진 몬스터입니다.");
+                AnsiConsole.MarkupLine("이미 쓰러진 몬스터입니다.");
                 Console.ReadKey();
                 return;
             }
 
             Console.Clear();
-            Console.WriteLine("Battle!!\n");
+            AnsiConsole.MarkupLine("Battle!!\n");
 
             //int damage = (int)(player.totalPower * (100f / (100 + target.Defense)));
             //damage = Math.Max(3, damage); //-> 데미지가 너무약하면 아래 코드 주석처리하고 이코드 풀어서 사용하세요
@@ -404,8 +404,8 @@ namespace TextRpg
             // 공격 처리
             if (eva <= 10)
             {
-                Console.WriteLine($"{player.playerName} 의 공격!");
-                Console.WriteLine($"Lv.{target.Level} {target.Name} 을(를) 공격했지만 아무일도 일어나지 않았습니다.");
+                AnsiConsole.MarkupLine($"{player.playerName} 의 공격!");
+                AnsiConsole.MarkupLine($"Lv.{target.Level} {target.Name} 을(를) 공격했지만 아무일도 일어나지 않았습니다.");
             }
             else
             {
@@ -413,26 +413,26 @@ namespace TextRpg
                 int finalDamage = isCritical ? (int)(damage * 1.6) : damage;
                 target.Hit(finalDamage);
 
-                Console.WriteLine($"{player.playerName} 의 공격!");
-                Console.WriteLine(isCritical ? $"Lv.{target.Level} {target.Name} 을(를) 맞혔습니다. [데미지 : {finalDamage}] - 치명타 공격!!"
-                    : $"Lv.{target.Level} {target.Name} 을(를) 맞혔습니다. [데미지 : {finalDamage}]");
+                AnsiConsole.MarkupLine($"{player.playerName} 의 공격!");
+                AnsiConsole.MarkupLine(isCritical ? $"Lv.{target.Level} {target.Name} 을(를) 맞혔습니다. [[데미지 : {finalDamage}]] - 치명타 공격!!"
+                    : $"Lv.{target.Level} {target.Name} 을(를) 맞혔습니다. [[데미지 : {finalDamage}]]");
             }
 
 
             //여기에 데미지 처리
             if (!target.IsAlive)
-                Console.WriteLine($"\nLv.{target.Level} {target.Name}\nHP {target.MaxHP} -> Dead");
+                AnsiConsole.MarkupLine($"\nLv.{target.Level} {target.Name}\nHP {target.MaxHP} -> Dead");
             else
-                Console.WriteLine($"\nLv.{target.Level} {target.Name}\nHP {target.CurrentHP}");
+                AnsiConsole.MarkupLine($"\nLv.{target.Level} {target.Name}\nHP {target.CurrentHP}");
 
-            Console.WriteLine("\n0. 다음\n>>");
+            AnsiConsole.MarkupLine("\n0. 다음\n>>");
             Console.ReadLine();
 
             // 살아있는 몬스터들의 반격
             if (monsters.All(m => m.CurrentHP <= 0))
             {
                 Console.Clear();
-                Console.WriteLine("모든 몬스터를 처치했습니다!");
+                AnsiConsole.MarkupLine("모든 몬스터를 처치했습니다!");
                 Console.ReadKey();
                 return; // 함수 종료
             }
@@ -457,24 +457,24 @@ namespace TextRpg
 
             if (jobSkills.Count == 0)
             {
-                Console.WriteLine("사용 가능한 스킬이 없습니다.");
+                AnsiConsole.MarkupLine("사용 가능한 스킬이 없습니다.");
                 Console.ReadKey();
                 return;
             }
 
             // 2. 스킬 선택
-            Console.WriteLine($"{player.playerClass}의 사용 가능한 스킬 목록:");
+            AnsiConsole.MarkupLine($"{player.playerClass}의 사용 가능한 스킬 목록:");
             for (int i = 0; i < jobSkills.Count; i++)
             {
                 var s = jobSkills[i];
-                Console.WriteLine($"{i + 1}. {s.Name} (배수: {s.PowerMultiplier}, 마나 소모: {s.ManaCost})");
+                AnsiConsole.MarkupLine($"{i + 1}. {s.Name} (배수: {s.PowerMultiplier}, 마나 소모: {s.ManaCost})");
             }
 
             Console.Write("\n사용할 스킬 번호를 선택하세요 >> ");
             string input = Console.ReadLine();
             if (!int.TryParse(input, out int selected) || selected < 1 || selected > jobSkills.Count)
             {
-                Console.WriteLine("잘못된 입력입니다.");
+                AnsiConsole.MarkupLine("잘못된 입력입니다.");
                 Console.ReadKey();
                 return;
             }
@@ -484,7 +484,7 @@ namespace TextRpg
             // 3. 마나 체크
             if (player.mana < chosenSkill.ManaCost)
             {
-                Console.WriteLine("마나가 부족합니다.");
+                AnsiConsole.MarkupLine("마나가 부족합니다.");
                 Console.ReadKey();
                 return;
             }
@@ -494,7 +494,7 @@ namespace TextRpg
 
             // 5. 전체 몬스터 공격
             Console.Clear();
-            Console.WriteLine($"{player.playerName}의 [{chosenSkill.Name}] 발동!");
+            AnsiConsole.MarkupLine($"{player.playerName}의 [[{chosenSkill.Name}]] 발동!");
             Thread.Sleep(1000);
 
             int skillDamage = player.SkillPower(chosenSkill);
@@ -502,27 +502,27 @@ namespace TextRpg
             {
                 if (monster.CurrentHP <= 0)
                 {
-                    Console.WriteLine($"→ {monster.Name} 은(는) 이미 쓰러져 있습니다.");
+                    AnsiConsole.MarkupLine($"→ {monster.Name} 은(는) 이미 쓰러져 있습니다.");
                     continue;
                 }
 
                 int damage = Math.Max(1, skillDamage - monster.Defense);
                 monster.CurrentHP -= damage;
 
-                Console.WriteLine($"→ {monster.Name} 에게 {damage} 데미지!");
+                AnsiConsole.MarkupLine($"→ {monster.Name} 에게 {damage} 데미지!");
                 Thread.Sleep(300);
             }
 
-            Console.WriteLine("\n스킬 공격 종료!");
-            Console.WriteLine("아무키나 입력해주세요");
-            Console.WriteLine(">>");
+            AnsiConsole.MarkupLine("\n스킬 공격 종료!");
+            AnsiConsole.MarkupLine("아무키나 입력해주세요");
+            AnsiConsole.MarkupLine(">>");
             Console.ReadKey();
             Console.Clear();
 
             if (monsters.All(m => m.CurrentHP <= 0))
             {
                 Console.Clear();
-                Console.WriteLine("모든 몬스터를 처치했습니다!");
+                AnsiConsole.MarkupLine("모든 몬스터를 처치했습니다!");
                 Console.ReadKey();
                 return; // 함수 종료
             }
@@ -537,7 +537,7 @@ namespace TextRpg
             if (Monsters.All(m => m.IsAlive == false))
                 return;
 
-            Console.WriteLine("몬스터가 반격합니다!!\n");
+            AnsiConsole.MarkupLine("몬스터가 반격합니다!!\n");
             foreach (var m in monsters)
             {
                 if (m.CurrentHP > 0)
@@ -545,9 +545,9 @@ namespace TextRpg
                     int retaliation = Math.Max(1, m.Attack - player.totalDefense);
                     player.hp -= retaliation;
 
-                    Console.WriteLine($"Lv.{m.Level} {m.Name} 의 공격!");
-                    Console.WriteLine($"{player.playerName} 을(를) 맞혔습니다. [데미지 : {retaliation}]");
-                    Console.WriteLine($"\nLv.{player.level} {player.playerName}\nHP {player.hp + retaliation} → {player.hp}\n");
+                    AnsiConsole.MarkupLine($"Lv.{m.Level} {m.Name} 의 공격!");
+                    AnsiConsole.MarkupLine($"{player.playerName} 을(를) 맞혔습니다. [[데미지 : {retaliation}]]");
+                    AnsiConsole.MarkupLine($"\nLv.{player.level} {player.playerName}\nHP {player.hp + retaliation} → {player.hp}\n");
 
                     Thread.Sleep(500);
 

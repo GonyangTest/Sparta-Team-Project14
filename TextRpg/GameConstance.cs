@@ -71,6 +71,8 @@ namespace TextRpg
 
             // 회피 확률
             public const int EVASION_CHANCE = 10;
+            // 몬스터 최대 수
+            public const int MAX_MONSTER_COUNT = 4;
         }
         
         public static class Dungeon

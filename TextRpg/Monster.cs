@@ -8,7 +8,7 @@ namespace TextRpg
 {
     public class Monster
     { // 몬스터의 기본 스텟 받아오기
-        private string _stage;
+        private int _stage;
         private string _name;
         private int _level;
         private int _maxHP;
@@ -17,8 +17,9 @@ namespace TextRpg
         private int _defense;
         private int _dropExp;
         private int _dropGold;
+        private string _art; // 몬스터 아스키 아트 저장
 
-        public string Stage { 
+        public int Stage { 
             get => _stage; 
         }
         
@@ -57,6 +58,10 @@ namespace TextRpg
         
         public bool IsAlive => _currentHP > 0;
 
+        public string Art { 
+            get => _art; 
+        }
+
         // 생성자 추가
         public Monster()
         {
@@ -64,7 +69,7 @@ namespace TextRpg
         }
 
         // 편의를 위한 매개변수 있는 생성자
-        public Monster(string stage, string name, int level, int maxHP, int attack, int defense, int dropExp, int dropGold)
+        public Monster(int stage, string name, int level, int maxHP, int attack, int defense, int dropExp, int dropGold)
         {
             _stage = stage;
             _name = name;
@@ -75,6 +80,21 @@ namespace TextRpg
             _dropExp = Math.Max(0, dropExp);
             _dropGold = Math.Max(0, dropGold);
             _currentHP = _maxHP;
+        }
+
+        // 아스키 아트 설정 메서드
+        public void SetArt(string art)
+        {
+            _art = art;
+        }
+
+        // 몬스터 아트 출력 메서드
+        public void DisplayArt()
+        {
+            if (!string.IsNullOrEmpty(_art))
+            {
+                Console.WriteLine(_art);
+            }
         }
 
         public override string ToString()

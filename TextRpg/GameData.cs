@@ -18,11 +18,15 @@ namespace TextRpg
         // 퀘스트 정보
         public QuestData QuestData { get; set; }
 
+        // 상점 정보
+        public ShopData ShopData { get; set; }
+
         public GameData()
         {
             PlayerData = new PlayerData();
             InventoryData = new InventoryData();
             QuestData = new QuestData();
+            ShopData = new ShopData();
         }
     }
 }

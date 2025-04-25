@@ -163,41 +163,41 @@ namespace TextRpg
             var choice = AnsiConsole.Prompt(
                 new SelectionPrompt<Item>()
                     .Title("판매하려는 아이템을 선택해주세요.")
-                    .PageSize(10)   
+                    .PageSize(10)
                     .AddChoices(ownedItems)
                     .WrapAround()
                     .UseConverter(item => item == null ? "뒤로가기" : $"- {item.GetInfo()} | 가격 : {(int)(item.price * 0.85)}"));
 
-             Item selectedItem = choice;
-             if (selectedItem != null)
-             {
-                 // 아이템이 장착 중이라면 해제
-                 if (selectedItem == _player.EquippedWeapon)
-                 {
-                     _player.EquippedWeapon = null;
-                     Console.WriteLine($"{selectedItem.itemName}을(를) 해제했습니다. (무기)");
-                 }
-                 else if (selectedItem == _player.EquippedArmor)
-                 {
-                     _player.EquippedArmor = null;
-                     Console.WriteLine($"{selectedItem.itemName}을(를) 해제했습니다. (방어구)");
-                 }
-                                 
+            Item selectedItem = choice;
+            if (selectedItem != null)
+            {
+                // 아이템이 장착 중이라면 해제
+                if (selectedItem == _player.EquippedWeapon)
+                {
+                    _player.EquippedWeapon = null;
+                    Console.WriteLine($"{selectedItem.itemName}을(를) 해제했습니다. (무기)");
+                }
+                else if (selectedItem == _player.EquippedArmor)
+                {
+                    _player.EquippedArmor = null;
+                    Console.WriteLine($"{selectedItem.itemName}을(를) 해제했습니다. (방어구)");
+                }
+
                 Item? item = items.Find(item => item.itemName == selectedItem.itemName);
                 if (item != null)
                 {
                     item.isPurchased = false;
                 }
 
-                 // 아이템 판매 처리
-                 inventory.RemoveItem(selectedItem); // 아이템을 인벤토리에서 제거
-                 int sellPrice = (int)(selectedItem.price * 0.85); // 85% 가격
-                 _player.gold += sellPrice; // 골드 증가
+                // 아이템 판매 처리
+                inventory.RemoveItem(selectedItem); // 아이템을 인벤토리에서 제거
+                int sellPrice = (int)(selectedItem.price * 0.85); // 85% 가격
+                _player.gold += sellPrice; // 골드 증가
 
-                 Console.WriteLine($"{selectedItem.itemName}을(를) {sellPrice} G에 판매했습니다!");
-                 Console.WriteLine($"현재 보유 골드: {_player.gold} G");
+                Console.WriteLine($"{selectedItem.itemName}을(를) {sellPrice} G에 판매했습니다!");
+                Console.WriteLine($"현재 보유 골드: {_player.gold} G");
 
-             }
+            }
 
         }
 
@@ -208,6 +208,11 @@ namespace TextRpg
             selectedItem = null;  // 선택된 아이템 초기화
             return tmp;  // 아이템 반환
         }
-    }
 
+        public List<Item> GetItems()
+        {
+            return items;
+        }
+
+    }
 }

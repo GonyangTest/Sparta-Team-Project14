@@ -1,21 +1,75 @@
 ﻿using System.Runtime.InteropServices;
 using TextRpg;
+using System.Text;
+using Spectre.Console;
 
 internal class Program
 {
+
+    internal static Player player = new Player();
+    internal static Inventory inventory = new Inventory();
+    internal static Quest quest = new Quest();
+
     static void Main(string[] args)
     {
-        
-        Player player = new Player();
+        Console.OutputEncoding = Encoding.UTF8;
+        Console.SetWindowSize(150, 60);
+
+        // 게임 불러오기
+        if (SaveLoadManager.SaveFileExists())  // 저장된 게임 파일이 있으면 불러오기
+        {
+            Console.WriteLine("저장된 기록이 있습니다. 불러오시겠습니까?");
+            string saveSelect = Console.ReadLine();
+            List<string> startMenu = new List<string>
+                {
+                    "1. 불러오기",
+                    "2. 새 시작",
+                    "0. 게임종료"
+                };
+            var startChoice = AnsiConsole.Prompt(
+                new SelectionPrompt<string>()
+                    .Title("원하시는 [green]행동[/]을 선택해주세요.")
+                    .PageSize(10)
+                    .AddChoices(startMenu));
+
+            int index = int.Parse(startChoice.Split('.')[0]);
+            switch (index)
+            {
+                case 0:
+                    break;
+                case 1:
+                    bool loaded = SaveLoadManager.LoadGame(player, inventory, quest);
+                    if (loaded)
+                    {
+                        Console.WriteLine("저장된 게임을 성공적으로 불러왔습니다.");
+                    }
+                    else
+                    {
+                        Console.WriteLine("게임 불러오기 실패.");
+                    }
+                    break;
+                case 2:
+                    Console.WriteLine("새로운 게임을 시작합니다.");
+                    player.SetPlayer();  // 새로운 게임 시작
+                    break;
+
+            }
+            
+        }
+        else
+        {
+            Console.WriteLine("저장된 게임 파일이 없습니다. 새로운 게임을 시작합니다.");
+            player.SetPlayer();  // 새로운 게임 시작
+        }
+
+        // 게임 진행
         Town town = new Town();
-        Inventory inventory = new Inventory();
         Shop shop = new Shop(player);
         Dungeon dungeon = new Dungeon();
         Rest rest = new Rest();
 
-        player.SetPlayer();
         Console.Clear(); // 콘솔 화면 정리 (선택사항)
-        town.TownMap(player, inventory, shop, dungeon, rest);
-
+        town.TownMap(player, inventory, shop, dungeon, rest, quest); // 마을 지도
     }
 }
+

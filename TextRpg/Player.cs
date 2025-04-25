@@ -5,9 +5,14 @@ using System.Reflection.Emit;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
-
+using Spectre.Console;
 namespace TextRpg
 {
+    public enum SkillType
+    {
+        Single,
+        AoE
+    }
 
     public class Job
     {
@@ -49,25 +54,27 @@ namespace TextRpg
         public string Name;
         public float PowerMultiplier;
         public int ManaCost;
+        public SkillType Type;
 
-        public Skill(string job, string name, float powerMultiplier, int manaCost)
+        public Skill(string job, string name, float powerMultiplier, int manaCost, SkillType type)
         {
             Job = job;
             Name = name;
             PowerMultiplier = powerMultiplier;
             ManaCost = manaCost;
+            Type = type;
         }
 
         public static Dictionary<int, Skill> SkillList = new Dictionary<int, Skill>()
         {
-            {1, new Skill("전사", "강타", 2f, 10) },
-            {2, new Skill("전사", "대지의분노", 1.5f, 20) },
-            {3, new Skill("도적", "기습", 2f, 10) },
-            {4, new Skill("도적", "그림자 춤", 1.5f, 20) },
-            {5, new Skill("궁수", "더블샷", 2f, 10) },
-            {6, new Skill("궁수", "화살비", 1.5f, 20) },
-            {7, new Skill("마법사", "파이어볼", 2f, 10) },
-            {8, new Skill("마법사", "메테오", 1.5f, 20) }
+            {1, new Skill("전사", "강타", 2f, 10, SkillType.Single) },
+            {2, new Skill("전사", "대지의분노", 1.5f, 20, SkillType.AoE) },
+            {3, new Skill("도적", "기습", 2f, 10, SkillType.Single) },
+            {4, new Skill("도적", "그림자 춤", 1.5f, 20, SkillType.AoE) },
+            {5, new Skill("궁수", "더블샷", 2f, 10, SkillType.Single) },
+            {6, new Skill("궁수", "화살비", 1.5f, 20, SkillType.AoE) },
+            {7, new Skill("마법사", "파이어볼", 2f, 10, SkillType.Single) },
+            {8, new Skill("마법사", "메테오", 1.5f, 20, SkillType.AoE) }
         };
     }
 
@@ -100,87 +107,76 @@ namespace TextRpg
 
         public void SetPlayer()
         {
+            Console.Clear();
+            AnsiConsole.MarkupLine("스파르타 던전에 오신 여러분 환영합니다.");
+            var userName = AnsiConsole.Prompt(
+                new TextPrompt<string>("[bold]원하시는 이름을 설정해주세요:[/]")
+                .PromptStyle("white")
+                .DefaultValue("[dim gray]예) 스파르타 전사[/]")
+                .AllowEmpty());
 
-            while (true)
+            playerName = userName;
+            List<string> userNameList = new List<string>()
             {
-                bool isSave = true;
-                Console.Clear();
-                Console.WriteLine("스파르타 던전에 오신 여러분 환영합니다.");
-                Console.WriteLine("원하시는 이름을 설정해주세요.");
-                string userName = Console.ReadLine();
-                playerName = userName;
+                "1. 저장",
+                "2. 취소"
+            };
 
-                while (true)
-                {
-                    Console.Clear();
-                    Console.WriteLine($"입력하신 이름은 {playerName}입니다.\n");
-                    Console.WriteLine("1.저장\n2.취소\n");
-                    Console.WriteLine("원하시는 행동을 입력해주세요.");
-                    string userNameSelect = Console.ReadLine();
 
-                    int userNameTmp;
-                    if (!int.TryParse(userNameSelect, out userNameTmp))
-                    {
-                        Console.Clear();
-                        Console.WriteLine("목록에 나온 숫자만 입력하세요.");
-                        Console.ReadKey();
-                    }
-                    else
-                    {
-                        switch (userNameTmp)
-                        {
-                            case 1:
-                                playerName = userName;
-                                break;
-                            case 2:
-                                Console.Clear();
-                                isSave = false;
-                                break;
-                            default:
-                                Console.Clear();
-                                Console.WriteLine("목록에 나온 숫자만 입력하세요.");
-                                Console.ReadKey();
-                                continue;
-                        }
-                    }
-                    break;
-                }
-                if (isSave)
-                {
-                    break;
-                }
-            }
-            while (true)
+
+            Console.Clear();
+            AnsiConsole.MarkupLine($"입력하신 이름은 [bold]'{playerName}'[/]입니다.\n");
+            var choice = AnsiConsole.Prompt(
+                new SelectionPrompt<string>()
+                    .Title("원하시는 행동을 선택해주세요.")
+                    .PageSize(10)
+                    .AddChoices(userNameList)
+                    .WrapAround());
+
+            int index = int.Parse(choice.Split('.')[0]);
+
+
+            switch (index)
             {
-                Console.Clear();
-                Console.WriteLine("스파르타 던전에 오신 여러분 환영합니다.");
-                Console.WriteLine("원하시는 직업을 설정해주세요.\n");
-                Console.WriteLine("1.전사\n2.도적\n3.궁수\n4.마법사\n");
-                Console.WriteLine("원하시는 행동을 입력해주세요.");
-                string job = Console.ReadLine();
-
-                int selectJob;
-                if (!int.TryParse(job, out selectJob))
-                {
+                case 1:
+                    playerName = userName;
+                    break;
+                case 2:
                     Console.Clear();
-                    Console.WriteLine("목록에 나온 숫자만 입력하세요.");
-                    Console.ReadKey();
-                }
-
-                SelectedJob = Job.JobList[selectJob];
-                playerClass = SelectedJob.Name;
-                hp = SelectedJob.Hp;
-                mana = SelectedJob.Mana;
-                maxHp = SelectedJob.MaxHp;
-                maxMp = SelectedJob.MaxMp;
-                power = SelectedJob.Power;
-                defense = SelectedJob.Defense;
-                agility = SelectedJob.Agility;
-                criticalChance = SelectedJob.CriticalChance;
-
-                break;
-
+                    break;
             }
+
+            List<string> jobList = new List<string>()
+            {
+                "1. 전사",
+                "2. 도적",
+                "3. 궁수",
+                "4. 마법사"
+            };
+
+            Console.Clear();
+            Console.WriteLine("스파르타 던전에 오신 여러분 환영합니다.");
+            Console.WriteLine("원하시는 직업을 설정해주세요.\n");
+            
+            choice = AnsiConsole.Prompt(
+                new SelectionPrompt<string>()
+                    .Title("원하시는 직업을 선택해주세요.")
+                    .PageSize(10)
+                    .AddChoices(jobList)
+                    .WrapAround());
+
+            index = int.Parse(choice.Split('.')[0]);
+
+            SelectedJob = Job.JobList[index];
+            playerClass = SelectedJob.Name;
+            hp = SelectedJob.Hp;
+            mana = SelectedJob.Mana;
+            maxHp = SelectedJob.MaxHp;
+            maxMp = SelectedJob.MaxMp;
+            power = SelectedJob.Power;
+            defense = SelectedJob.Defense;
+            agility = SelectedJob.Agility;
+            criticalChance = SelectedJob.CriticalChance;
         }
 
         public bool UseHealthPotion()
@@ -206,7 +202,16 @@ namespace TextRpg
             return ManaPotion.Use(this);
         }
 
+        public void Hit(int hp_decrease)
+        {
+            hp = Math.Clamp(hp - hp_decrease, 0, maxHp);
+        }
 
+        public void AddExp(int expAmount)
+        {
+            exp += expAmount; // 매개변수만큼 경험치를 더하고
+            LevelUp(); // 레벨업 체크
+        }
 
         // 레벨업시 변화
         public void LevelUp()
@@ -223,8 +228,13 @@ namespace TextRpg
                 // 레벨업시 공격력 0.5증가 방어력 1증가
                 power += 0.5f;
                 defense += 1;
-            }
 
+                // 레벨 달성 퀘스트 판정
+                Program.quest.QuestRenewal(2, level);
+
+                // 레벨업 메세지
+                AnsiConsole.MarkupLine($"[yellow]{playerName}[/] 의 레벨이 [yellow]{level}[/] 로 올랐습니다.");
+            }
         }
         public float totalPower
         {
@@ -256,10 +266,8 @@ namespace TextRpg
             return criticalDamage;
         }
 
-        public string CurrentPlayer()
+        public string PrintPlayer()
         {
-            while (true)
-            {
                 Console.WriteLine("상태보기\n");
                 Console.WriteLine("캐릭터의 정보가 표시됩니다.\n");
                 return $"[플레이어 정보]\n" +
@@ -276,31 +284,6 @@ namespace TextRpg
                 $"장착 무기: {(EquippedWeapon != null ? EquippedWeapon.itemName : "없음")}\n" +
                 $"장착 방어구: {(EquippedArmor != null ? EquippedArmor.itemName : "없음")}\n" +
                 $"골드 : {gold} G\n";
-                Console.WriteLine("0. 나가기\n");
-                Console.WriteLine("원하시는 행동을 입력해주세요.");
-                string current = Console.ReadLine();
-                int currentSelect;
-                if (!int.TryParse(current, out currentSelect))
-                {
-                    Console.Clear();
-                    Console.WriteLine("목록에 나온 숫자만 입력하세요.");
-                    Console.ReadKey();
-                }
-                else
-                {
-                    switch (currentSelect)
-                    {
-                        case 0:
-                            break;
-                        default:
-                            Console.Clear();
-                            Console.WriteLine("목록에 나온 숫자만 입력하세요.");
-                            Console.ReadKey();
-                            continue;
-                    }
-                }
-                break;
-            }
         }
     }
 }

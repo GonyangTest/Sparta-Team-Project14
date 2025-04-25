@@ -52,7 +52,8 @@ namespace TextRpg
                 new SelectionPrompt<string>()
                     .Title("원하시는 [green]행동[/]을 선택해주세요.")
                     .PageSize(10)
-                    .AddChoices(menu));
+                    .AddChoices(menu)
+                    .WrapAround());
 
                 int index = int.Parse(choice.Split('.')[0]);
 
@@ -89,6 +90,7 @@ namespace TextRpg
                         .Title("[green]장착/해제[/]할 아이템을 선택하세요")
                         .PageSize(10)
                         .AddChoices(itemChoices)
+                        .WrapAround()
                         .UseConverter(item => {
                             if (item == null) return "0. 나가기";
                             

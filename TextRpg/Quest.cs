@@ -72,7 +72,7 @@ namespace TextRpg
             questTmp.info = "이봐! 마을 근처에 몬스터들이 너무 많아졌다고 생각하지 않나?\n" +
                             "마을주민들의 안전을 위해서라도 저것들 수를 좀 줄여야 한다고!\n" +
                             "모험가인 자네가 좀 처치해주게!\n";
-            questTmp.goalInfo = " - 몬스터 5마리 처치 ({0}/{1})\n";
+            questTmp.goalInfo = " - 몬스터 5마리 처치";
             questTmp.goal = 5;
             questTmp.isOverrideCount = false;
             questTmp.rewards.exp = 0;
@@ -86,7 +86,7 @@ namespace TextRpg
             questTmp.info = "훌륭한 모험가는 좋은 장비를 착용하는 법이지\n" +
                             "맨손으로 몬스터에게 맞선다고? 자네 제정신인가?\n" +
                             "아무 장비라도 하나 걸쳐보게\n";
-            questTmp.goalInfo = " - 장비 착용해보기 ({0}/{1})\n";
+            questTmp.goalInfo = " - 장비 착용해보기";
             questTmp.goal = 1;
             questTmp.isOverrideCount = true;
             questTmp.rewards.exp = 10;
@@ -99,7 +99,7 @@ namespace TextRpg
             questTmp.info = "모험가 협회에서는 모험가들에게 지원을 하고 있다네\n" +
                             "일정 수준 이상의 모험가들은 협회에도 귀한 자원이니 말일세\n" +
                             "레벨 5를 달성한다면 다시 오게나\n";
-            questTmp.goalInfo = " - 레벨 달성 ({0}/{1})\n";
+            questTmp.goalInfo = " - 레벨 달성";
             questTmp.goal = 5;
             questTmp.rewards.exp = 0;
             questTmp.isOverrideCount = true;
@@ -169,7 +169,8 @@ namespace TextRpg
            new SelectionPrompt<string>()
            .Title("[yellow]Quest!![/]")
            .PageSize(quests.Count+1) // 퀘스트 수 + 나가기 메뉴
-           .AddChoices(questMenu));
+           .AddChoices(questMenu)
+           .WrapAround());
 
             // 선택한 메뉴가 몇번째인가?
             int index = 0;
@@ -195,7 +196,7 @@ namespace TextRpg
                 AnsiConsole.Markup("[red] (달성)[/]");
             Console.WriteLine("\n");
             Console.WriteLine(quests[index].info); // 퀘스트 설명
-            Console.WriteLine(quests[index].goalInfo, quests[index].count, quests[index].goal); // 목표 설명                                                                
+            AnsiConsole.MarkupLine(quests[index].goalInfo + $" [red]({quests[index].count}/{quests[index].goal})[/]"); // 목표 설명                                                                
             // 퀘스트 보상 골드, 경험치 출력
             AnsiConsole.Markup("GOLD : [yellow]{0}[/] G\nEXP : [yellow]{1}[/] Exp\n\n", quests[index].rewards.gold, quests[index].rewards.exp);
             if (quests[index].rewards.items != null)

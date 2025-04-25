@@ -61,7 +61,8 @@ namespace TextRpg
                     new SelectionPrompt<string>()
                         .Title("원하시는 [green]행동[/]을 선택해주세요.")
                         .PageSize(10)
-                        .AddChoices(menu));
+                        .AddChoices(menu)
+                        .WrapAround());
 
                 int index = int.Parse(choice.Split('.')[0]);
 
@@ -93,6 +94,7 @@ namespace TextRpg
                         .Title("구매하려는 아이템을 선택해주세요.")
                         .PageSize(10)
                         .AddChoices(items)
+                        .WrapAround()
                         .UseConverter(item => item == null ? "뒤로가기" : $"- {item.GetInfo()}"));
 
                 selectedItem = choice; // items리스트의 타입이 Item이므로 Item형의 변수를 생성하고 입력받은 값을 items 리스트의 인덱스에 접근시킨다.
@@ -163,6 +165,7 @@ namespace TextRpg
                     .Title("판매하려는 아이템을 선택해주세요.")
                     .PageSize(10)   
                     .AddChoices(ownedItems)
+                    .WrapAround()
                     .UseConverter(item => item == null ? "뒤로가기" : $"- {item.GetInfo()} | 가격 : {(int)(item.price * 0.85)}"));
 
              Item selectedItem = choice;

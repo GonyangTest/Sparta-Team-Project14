@@ -7,9 +7,9 @@ using Spectre.Console;
 
 namespace TextRpg
 {
-    internal class Spectre_Ex
+    public static class Spectre_Ex
     {
-        static void Print_Spectre_Examples()
+        public static void Print_Spectre_Examples()
         {
             // 1. Markup 텍스트
             // 적용할 문자열 앞에 대괄호[], 이 안에 꾸며줄 방법을 쓰면 됩니다.
@@ -53,6 +53,7 @@ namespace TextRpg
 
             // 3. 박스 스타일 패널
             AnsiConsole.MarkupLine("\n\n3. 패널");
+
             var panel = new Panel("[yellow]던전 뿌셔[/]\n\n<< 보상 >>\n경험치: +100 Exp\n골드: +1000G\n\n아이템\n스파르타 무언가"); // 패널 생성 및 안에 들어갈 내용
             // 테두리 스타일(Rounded, Square, Ascii, None 등) Double, Heavy는 제대로 출력이 안되는 듯함
             panel.Border = BoxBorder.Rounded;
@@ -104,8 +105,9 @@ namespace TextRpg
             var menu = AnsiConsole.Prompt(
                        new SelectionPrompt<string>()
                        .Title("무엇을 하시겠습니까?")
-                       .PageSize(5)
-                       .AddChoices(new[] { "이어하기", "새로하기", "설정", "종료" }));
+                       .PageSize(4) // 항목 수
+                       .AddChoices(new[] { "이어하기", "새로하기", "설정", "종료" })
+                       .WrapAround()); // 리스트 순환 >> 맨 위 항목에서 위 방향키를 누르면 제일 아래 항목으로. 역도 성립
             Console.WriteLine($"선택한 메뉴: {menu}");
 
             // 3) MultiSelectionPrompt<T>() : 선택지 다중 선택 가능

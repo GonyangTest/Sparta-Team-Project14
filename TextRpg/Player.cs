@@ -123,7 +123,8 @@ namespace TextRpg
                 new SelectionPrompt<string>()
                     .Title("원하시는 행동을 선택해주세요.")
                     .PageSize(10)
-                    .AddChoices(userNameList));
+                    .AddChoices(userNameList)
+                    .WrapAround());
 
             int index = int.Parse(choice.Split('.')[0]);
 
@@ -154,7 +155,8 @@ namespace TextRpg
                 new SelectionPrompt<string>()
                     .Title("원하시는 직업을 선택해주세요.")
                     .PageSize(10)
-                    .AddChoices(jobList));
+                    .AddChoices(jobList)
+                    .WrapAround());
 
             index = int.Parse(choice.Split('.')[0]);
 
@@ -202,7 +204,6 @@ namespace TextRpg
         {
             exp += expAmount; // 매개변수만큼 경험치를 더하고
             LevelUp(); // 레벨업 체크
-            Program.quest.QuestRenewal(2, level); // 레벨 달성 퀘스트 판정
         }
 
         // 레벨업시 변화
@@ -220,8 +221,13 @@ namespace TextRpg
                 // 레벨업시 공격력 0.5증가 방어력 1증가
                 power += 0.5f;
                 defense += 1;
-            }
 
+                // 레벨 달성 퀘스트 판정
+                Program.quest.QuestRenewal(2, level);
+
+                // 레벨업 메세지
+                AnsiConsole.MarkupLine($"[yellow]{playerName}[/] 의 레벨이 [yellow]{level}[/] 로 올랐습니다.");
+            }
         }
         public float totalPower
         {

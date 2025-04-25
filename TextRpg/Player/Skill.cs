@@ -16,8 +16,10 @@ namespace TextRpg
 
     public class Skill
     {
+        public int Id { get; set; }
         public string Job;
         public string Name;
+        public string Description { get; set; }
         public float PowerMultiplier;
         public int ManaCost;
         public SkillType Type;
@@ -31,6 +33,7 @@ namespace TextRpg
             Type = type;
         }
 
+        // TODO: 나중에 삭제 필요
         public static Dictionary<int, Skill> SkillList = new Dictionary<int, Skill>()
         {
             {1, new Skill(GameConstance.Job.WARRIOR, "강타", 2f, 10, SkillType.Single) },
@@ -42,5 +45,10 @@ namespace TextRpg
             {7, new Skill(GameConstance.Job.MAGE, "파이어볼", 2f, 10, SkillType.Single) },
             {8, new Skill(GameConstance.Job.MAGE, "메테오", 1.5f, 20, SkillType.AoE) }
         };
+        
+        public override string ToString()
+        {
+            return $"이름 : {Name} | 설명 : {Description} | 스킬 계수 : {PowerMultiplier} | 마나 소모 : {ManaCost}";
+        }
     }
 }

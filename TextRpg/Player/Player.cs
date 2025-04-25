@@ -215,7 +215,8 @@ namespace TextRpg
                 $"치명타확률: {criticalChance}\n" +
                 $"장착 무기: {(EquippedWeapon != null ? EquippedWeapon.itemName : "없음")}\n" +
                 $"장착 방어구: {(EquippedArmor != null ? EquippedArmor.itemName : "없음")}\n" +
-                $"골드 : {gold} G\n";
+                $"골드 : {gold} G\n" +
+                $"[스킬목록]\n{string.Join("\n", SkillFactory.GetSkillsByJob(playerClass).Select(skill => skill.ToString()))}";
         }
     }
 }

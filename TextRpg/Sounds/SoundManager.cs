@@ -28,15 +28,15 @@ namespace TextRpg
 
         public void StartMainMusic()
         {
-            backgroundMusic = new Music("Sounds/Main.mp3");
-            backgroundMusic.SetVolume(0.05f);
+            backgroundMusic = new Music(GameConstance.Sound.MAIN_SOUND_PATH);
+            backgroundMusic.SetVolume(GameConstance.Sound.MAIN_SOUND_VOLUME);
             backgroundMusic.PlayLooping();
         }
 
         public void StartDungeonMusic()
         {
-            backgroundMusic = new Music("Sounds/Dungeon.mp3");
-            backgroundMusic.SetVolume(0.05f);
+            backgroundMusic = new Music(GameConstance.Sound.DUNGEON_SOUND_PATH);
+            backgroundMusic.SetVolume(GameConstance.Sound.DUNGEON_SOUND_VOLUME);
             backgroundMusic.PlayLooping();
         }
 

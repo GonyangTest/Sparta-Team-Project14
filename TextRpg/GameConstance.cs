@@ -85,5 +85,14 @@ namespace TextRpg
         {
             public const int USE_POTION_SLEEP_TIME = 300;
         }
+
+        public static class Sound
+        {
+            public const string MAIN_SOUND_PATH = "Sounds/Main.mp3";
+            public const string DUNGEON_SOUND_PATH = "Sounds/Dungeon.mp3";
+
+            public const float MAIN_SOUND_VOLUME = 0.05f;
+            public const float DUNGEON_SOUND_VOLUME = 0.05f;
+        }
     }
 }

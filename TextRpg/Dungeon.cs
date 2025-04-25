@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using Spectre.Console;
 
 namespace TextRpg
 {
@@ -156,12 +158,6 @@ namespace TextRpg
 
             Battle(player, Monsters);
 
-            if (player.hp > 0 && Monsters.All(m => m.CurrentHP <= 0))
-            {
-                Cleared = true;
-                Console.WriteLine($"=== {Name} 스테이지 클리어! ===\n");
-            }
-
 
             Console.WriteLine("계속하려면 아무 키나 누르세요...");
             Console.ReadKey();
@@ -170,8 +166,17 @@ namespace TextRpg
 
         private void Battle(Player player, List<Monster> monsters)
         {
+            // 몬스터가 다 죽었을 때는 루프를 빠져나가서 보상을 받을 수 있도록 변경
             while (true)
             {
+                // Start() 내부에 있던 클리어 판정 구문을 여기로 이동
+                // 조건 수정: 플레이어 패배 or 몬스터가 모두 사망한 상태
+                if (player.hp <= 0 || Monsters.All(m => m.IsAlive == false))
+                {
+                    Cleared = true;
+                    break;
+                }
+
                 Console.Clear();
                 Console.WriteLine("Battle!!\n");
 
@@ -186,72 +191,155 @@ namespace TextRpg
                 Console.WriteLine("\n[내정보]");
                 Console.WriteLine($"Lv.{player.level} {player.playerName} ({player.playerClass})");
                 Console.WriteLine($"HP {player.hp}/{player.maxHp}\n");
+                Console.WriteLine($"MP {player.mana}/{player.maxMp}\n");
 
-                Console.WriteLine("0. 취소\n");
+                string[] battleMenus = new string[] { "1. 기본 공격", "2. 스킬 공격\n", "0. 도망" };
 
-                Console.WriteLine("1. 기본 공격");
-                Console.WriteLine("2. 스킬 공격");
+                var menu = AnsiConsole.Prompt(
+                            new SelectionPrompt<string>()
+                           .Title("무엇을 하시겠습니까?")
+                           .PageSize(3) // 항목 수
+                           .AddChoices(battleMenus)
+                           .WrapAround()); // 리스트 순환 >> 맨 위 항목에서 위 방향키를 누르면 제일 아래 항목으로. 역도 성립
 
-                Console.Write("공격할 수단을 선택해주세요.\n>> ");
-                string input = Console.ReadLine();
+                // 선택한 메뉴가 몇번째인가?
+                int index = 0;
+                foreach (var battleMenu in battleMenus)
+                {
+                    if (battleMenu == menu)
+                        break;
+                    else
+                        index++;
+                }
 
-                Console.Clear();
-
-                if (input == "0") return;
-
-                if (input == "1")
+                // 선택지 선택에 따른 동작
+                if (index == 0)
                 {
                     BasicAttack(player, monsters);
                     continue;
                 }
-
-                if (input == "2")
+                else if (index == 1)
                 {
                     SkillAttack(player, monsters);
                     continue;
                 }
-
-                Console.Write("\n>> ");
-                string targetInput = Console.ReadLine();
-
-                /*if (int.TryParse(targetInput, out int index) && index > 0 && index <= monsters.Count)
-                {
-                    var target = monsters[index - 1];
-
-                    if (!target.IsAlive)
-                    {
-                        Console.WriteLine("이미 죽은 몬스터입니다.");
-                        Console.ReadKey();
-                        continue;
-                    }
-                    if (player.hp <= 0 || monsters.All(m => m.CurrentHP <= 0))
-                        break;
-                }
-                else
-                {
-                    Console.WriteLine("잘못된 입력입니다.");
-                    Console.ReadKey();
-                }*/
+                else if (index == 2)
+                    return; // 도망
             }
 
-            Console.Clear();
-            Console.WriteLine("Battle!! = Result\n");
+            // 던전 클리어 결과창
+            Result(player, monsters);
+        }
 
+        void Result(Player player, List<Monster> monsters)
+        {
+            int killCount = 0;
+            string panelHeader = "";
+
+            // 전투 승리/패배에 따라
+            // 처치한 몬스터에 따라 얻은 골드, 경험치 계산
             if (player.hp > 0)
             {
-                Console.WriteLine("Victory\n");
+                int gold = 0,
+                    increasePerLoop_gold = 0,
+                    exp = 0,
+                    increasePerLoop_exp = 0,
+                    resultLoopCount = 0;
+
+                panelHeader += "[green]Victory[/]";
                 Console.WriteLine($"던전에서 몬스터 {monsters.Count}마리를 잡았습니다.");
+
+                // 모든 몬스터를 잡았기에 몬스터 수 전체를 잡은 수에 추가
+                killCount = monsters.Count;
+                // 전투 승리시에만 처치한 몬스터들로부터 골드, 경험치 획득량 계산
+                for (int i = 0; i < monsters.Count; i++)
+                {
+                    gold += monsters[i].DropGold;
+                    exp += monsters[i].DropExp;
+                }
+
+                // 경험치,골드 획득!
+                player.gold += gold;
+                player.AddExp(exp);
+
+                // 결과창 보여주는 루프 횟수, 루프 당 값 상승량
+                resultLoopCount = 10;
+                increasePerLoop_gold = gold / resultLoopCount;
+                increasePerLoop_exp = exp / resultLoopCount;
+                // 보여주기 위한 초기화
+                gold = exp = 0;
+
+                // 결과창의 숫자가 점점 증가하는 것을 보여주기 위한 루프
+                for (int i = 0; i < resultLoopCount; i++)
+                {
+                    // 패널 안에 들어갈 내용
+                    string inPanel =
+                    $"Lv.{player.level} {player.playerName}\n" +
+                    $"HP {player.hp}/{player.maxHp}\n" +
+                    $"MP [blue]{++player.mana}[/]/{player.maxMp}\n\n" +
+                    $"  << 보상 >>\n" +
+                    $"골  드: +[yellow]{gold}[/] G\n" +
+                    $"경험치: +[yellow]{exp}[/] Exp";
+
+                    // 전투 승리 후 플레이어 마나 자연적으로 10 회복 // 루프당 1씩 회복되는 모습
+                    // 드랍 아이템... 없다??? 없으면 아이템은 빼기
+
+                    Console.Clear();
+                    Console.WriteLine("Battle!! = Result\n");
+                    var panel = new Panel(inPanel); // 패널 생성 및 안에 들어갈 내용 
+                                                    // 테두리 스타일(Rounded, Square, Ascii, None 등) Double, Heavy는 제대로 출력이 안되는 듯함
+                    panel.Border = BoxBorder.Rounded;
+                    // 패널 상단 중앙에 제목 적기(왼쪽, 오른쪽으로도 변경 가능)
+                    panel.Header = new PanelHeader(panelHeader, Justify.Center);
+                    // 패널 출력
+                    AnsiConsole.Write(panel);
+                    
+                    // 다음 루프를 위한 더하기
+                    gold += increasePerLoop_gold;
+                    exp += increasePerLoop_exp;
+
+                    // 숫자가 변하는 것을 보여주기 위한 딜레이
+                    Thread.Sleep(100);
+                }
             }
             else
             {
-                Console.WriteLine("You Lose\n");
+                // 패널 헤더
+                panelHeader += "[red]You Lose[/]";
+                // 패널 안에 들어갈 내용
+                string inPanel =
+                $"Lv.{player.level} {player.playerName}\n" +
+                $"HP {player.hp}/{player.maxHp}\n" +
+                $"MP {player.mana}/{player.maxMp}";
+
+                Console.Clear();
+                Console.WriteLine("Battle!! = Result\n");
+                var panel = new Panel(inPanel); // 패널 생성 및 안에 들어갈 내용 
+                                                // 테두리 스타일(Rounded, Square, Ascii, None 등) Double, Heavy는 제대로 출력이 안되는 듯함
+                panel.Border = BoxBorder.Rounded;
+                // 패널 상단 중앙에 제목 적기(왼쪽, 오른쪽으로도 변경 가능)
+                panel.Header = new PanelHeader(panelHeader, Justify.Center);
+                // 패널 출력
+                AnsiConsole.Write(panel);
+
+                // 처치한 몬스터 수만 카운트
+                if (Program.quest.Get_questData().ContainsKey(0))
+                {
+                    for (int i = 0; i < monsters.Count; i++)
+                    {
+                        if (!monsters[i].IsAlive)
+                            killCount++;
+                    }
+                }
             }
 
-            Console.WriteLine($"\nLv.{player.level} {player.playerName}\nHP {player.hp}");
+            // 퀘스트에 잡은 몬스터 수를 카운트
+            Program.quest.QuestRenewal(0, killCount);
+
+
             Console.WriteLine("\n0. 다음\n>>");
             Console.ReadLine();
         }
-
         private void BasicAttack(Player player, List<Monster> monsters)
         {
 
@@ -417,13 +505,15 @@ namespace TextRpg
 
         private void MonsterCounterAttack(Player player, List<Monster> monsters)
         {
+            // 반격할 몬스터가 없는데 반격하는 경우 발생
+            if (Monsters.All(m => m.IsAlive == false))
+                return;
 
             Console.WriteLine("몬스터가 반격합니다!!\n");
             foreach (var m in monsters)
             {
                 if (m.CurrentHP > 0)
                 {
-
                     int retaliation = Math.Max(1, m.Attack - player.totalDefense);
                     player.hp -= retaliation;
 

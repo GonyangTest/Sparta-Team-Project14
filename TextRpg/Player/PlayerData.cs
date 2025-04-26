@@ -12,7 +12,7 @@ namespace TextRpg
         public string PlayerName { get; set; }
         public string PlayerClass { get; set; }
         public int Level { get; set; }
-        public int Exp { get; set; }
+        public double Exp { get; set; }
         public int MaxExp { get; set; }
         public int Gold { get; set; }
         public int Hp { get; set; }

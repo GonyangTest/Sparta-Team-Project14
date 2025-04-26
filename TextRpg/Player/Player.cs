@@ -15,7 +15,7 @@ namespace TextRpg
         public string playerName;
         public string playerClass;
         public int level = GameConstance.Player.INITIAL_LEVEL;
-        public int exp = GameConstance.Player.INITIAL_EXP;
+        public double exp = GameConstance.Player.INITIAL_EXP;
         public int maxExp = GameConstance.Player.INITIAL_MAX_EXP;
         public int gold = GameConstance.Player.INITIAL_GOLD;
         public int hp;
@@ -140,7 +140,7 @@ namespace TextRpg
             hp = Math.Clamp(hp - hp_decrease, 0, maxHp);
         }
 
-        public void AddExp(int expAmount)
+        public void AddExp(double expAmount)
         {
             exp += expAmount; // 매개변수만큼 경험치를 더하고
             LevelUp(); // 레벨업 체크
@@ -216,7 +216,7 @@ namespace TextRpg
                 statTable.AddRow("[white]이름[/]", $"{playerName}");
                 statTable.AddRow("[white]직업[/]", $"{playerClass}");
                 statTable.AddRow("[white]레벨[/]", $"{level}");
-                statTable.AddRow("[white]경험치[/]", $"{exp}/{maxExp}");
+                statTable.AddRow("[white]경험치[/]", $"{(int)exp}/{maxExp}");
                 statTable.AddRow("[white]체력[/]", $"{hp}/{maxHp}");
                 statTable.AddRow("[white]마력[/]", $"{mana}/{maxMp}");
                 statTable.AddRow("[white]공격력[/]", $"{totalPower}");

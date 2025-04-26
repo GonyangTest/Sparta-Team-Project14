@@ -220,7 +220,7 @@ namespace TextRpg
             Console.WriteLine(quests[index].info); // 퀘스트 설명
             AnsiConsole.MarkupLine(quests[index].goalInfo + $" [red]({quests[index].count}/{quests[index].goal})[/]"); // 목표 설명                                                                
             // 퀘스트 보상 골드, 경험치 출력
-            AnsiConsole.Markup("GOLD : [yellow]{0}[/] G\nEXP : [yellow]{1}[/] Exp\n\n", quests[index].rewards.gold, quests[index].rewards.exp);
+            AnsiConsole.Markup("GOLD : [yellow]{0}[/] G\nEXP : [yellow]{1}[/] Exp\n\n", quests[index].rewards.gold, (int)quests[index].rewards.exp);
             if (quests[index].rewards.items != null)
             {
                 // 퀘스트 보상 아이템들 목록 전체에 대해
@@ -315,7 +315,7 @@ namespace TextRpg
         // 그냥 추가 메세지로 완료했다고 띄워주는 것으로 변경하기 >> 꾸밀 때 패널로 구분해줘도 좋다고 생각 
         public void AlarmAccomplish()
         {
-            string questResult = $"[yellow]{title}[/]\n\n<< 보상 >>\n골드: +{rewards.gold} G\n경험치: +{rewards.exp} Exp\n";
+            string questResult = $"[yellow]{title}[/]\n\n<< 보상 >>\n골드: +{rewards.gold} G\n경험치: +{(int)rewards.exp} Exp\n";
             if (rewards.items != null)
             {
                 questResult += "\n아이템\n";
@@ -339,7 +339,7 @@ namespace TextRpg
         public struct Rewards
         {
             public int gold;
-            public int exp;
+            public double exp;
             public RewardItem[]? items;
         }
 

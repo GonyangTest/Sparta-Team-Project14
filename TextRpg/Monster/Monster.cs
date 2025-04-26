@@ -12,7 +12,7 @@ namespace TextRpg
         private string _name;
         private int _level;
         private int _maxHP;
-        private int _currentHP;
+        private double _currentHP;
         private int _attack;
         private int _defense;
         private int _dropExp;
@@ -35,7 +35,7 @@ namespace TextRpg
             get => _maxHP; 
         }
         
-        public int CurrentHP { 
+        public double CurrentHP { 
             get => _currentHP; 
             set => _currentHP = Math.Max(0, Math.Min(value, _maxHP));
         }

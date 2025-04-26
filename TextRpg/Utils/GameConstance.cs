@@ -12,7 +12,7 @@ namespace TextRpg
         public static class Player
         {
             public const int INITIAL_GOLD = 10000;
-            public const int INITIAL_EXP = 0;
+            public const double INITIAL_EXP = 0;
             public const int INITIAL_LEVEL = 1;
             public const int INITIAL_MAX_EXP = 10;
             public const float CRITICAL_DAMAGE_MULTIPLIER = 1.6f;

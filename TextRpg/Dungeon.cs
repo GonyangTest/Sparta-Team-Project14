@@ -5,7 +5,9 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using NAudio.Codecs;
 using Spectre.Console;
+using static TextRpg.GameConstance;
 
 namespace TextRpg
 {
@@ -14,42 +16,52 @@ namespace TextRpg
         Random rand = new Random();
         private List<Stage> _stages;
 
-        public void EnterDungeonMenu(Player player)
+        public void EnterDungeonMenu()
         {
             while (true)
             {
+
                 Console.Clear();
                 AnsiConsole.MarkupLine("**던전입장**");
                 AnsiConsole.MarkupLine("이곳에서 던전으로 들어가기전 활동을 할 수 있습니다.\n");
-                AnsiConsole.MarkupLine("1. 상태 보기");
-                AnsiConsole.MarkupLine("2. 전투 시작");
-                AnsiConsole.MarkupLine("0. 나가기\n");
-                Console.Write("원하시는 행동을 입력해주세요.\n>> ");
+                string[] menus_Seletable = new string[] { "1. 상태 보기", "2. 전투 시작\n", "0. 나가기" };
 
-                string input = Console.ReadLine();
+                var menu = AnsiConsole.Prompt(
+                            new SelectionPrompt<string>()
+                           .Title("무엇을 하시겠습니까?")
+                           .PageSize(3) // 항목 수(최소 3)
+                           .AddChoices(menus_Seletable)
+                           .WrapAround()); // 리스트 순환 >> 맨 위 항목에서 위 방향키를 누르면 제일 아래 항목으로. 역도 성립
 
-                switch (input)
+                // 선택한 메뉴가 몇번째인가?
+                int index = 0;
+                foreach (var menu_Seletable in menus_Seletable)
                 {
-                    case "1":
-                        Console.Clear();
-                        AnsiConsole.MarkupLine(player.PrintPlayer());
-                        AnsiConsole.MarkupLine("\n0. 나가기");
-                        Console.ReadLine();
+                    if (menu_Seletable == menu)
                         break;
-                    case "2":
-                        SoundManager.Instance.StopMusic();
-                        EnterDungeon(player);
-                        break;
-                    case "0":
-                        return;
-                    default:
-                        AnsiConsole.MarkupLine("잘못된 입력입니다.");
-                        Console.ReadKey();
-                        break;
+                    else
+                        index++;
+                }
+
+                // 선택지 선택에 따른 동작
+                if (index == 0)
+                {
+                    Console.Clear();
+                    AnsiConsole.MarkupLine(Program.player.PrintPlayer());
+                    AnsiConsole.Prompt(new SelectionPrompt<string>().AddChoices("나가기\n"));
+                }
+                else if (index == 1)
+                {
+                    SoundManager.Instance.StopMusic();
+                    EnterDungeon();
+                }
+                else
+                {
+                    return;
                 }
             }
         }
-        private void EnterDungeon(Player player)
+        private void EnterDungeon()
         {
             SoundManager.Instance.StartDungeonMusic();
             Console.Clear();
@@ -78,8 +90,8 @@ namespace TextRpg
 
                 foreach (Stage stage in _stages)
                 {
-                    stage.Start(player);
-                    if (player.hp <= 0)
+                    stage.Start();
+                    if (Program.player.hp <= 0)
                     {
                         AnsiConsole.MarkupLine("플레이어가 사망했습니다. 던전에서 퇴장합니다...");
                         Thread.Sleep(2000);
@@ -99,13 +111,28 @@ namespace TextRpg
 
                     // 다음 스테이지로 진행 여부
                     Console.Clear();
-                    AnsiConsole.MarkupLine($"현재까지 {stage.Name} 스테이지 클리어!");
-                    AnsiConsole.MarkupLine("1. 다음 스테이지 도전");
-                    AnsiConsole.MarkupLine("0. 마을로 돌아가기");
-                    Console.Write("\n선택 >> ");
-                    string input = Console.ReadLine();
+                    AnsiConsole.MarkupLine($"현재까지 [#6cf540]{stage.Name}[/] 스테이지 클리어!");
+                    string[] menus_Seletable = new string[] { "1. 다음 스테이지 도전", "0. 마을로 돌아가기" };
 
-                    if (input == "0")
+                    var menu = AnsiConsole.Prompt(
+                                new SelectionPrompt<string>()
+                               .Title("무엇을 하시겠습니까?")
+                               .PageSize(3) // 항목 수(최소 3)
+                               .AddChoices(menus_Seletable)
+                               .WrapAround()); // 리스트 순환 >> 맨 위 항목에서 위 방향키를 누르면 제일 아래 항목으로. 역도 성립
+
+                    // 선택한 메뉴가 몇번째인가?
+                    int index = 0;
+                    foreach (var menu_Seletable in menus_Seletable)
+                    {
+                        if (menu_Seletable == menu)
+                            break;
+                        else
+                            index++;
+                    }
+
+                    // 선택지 선택에 따른 동작
+                    if (index == 1)
                     {
                         AnsiConsole.MarkupLine("던전을 떠납니다...");
                         Thread.Sleep(1000);
@@ -134,19 +161,23 @@ namespace TextRpg
             get { return _cleared; }
          }
 
-        // 진행바 길이, 유닛 간 나누는 줄 길이, 몬스터 좌우 간격
-        int barWidth = 20, partician_Length = 15;
+        
+        int barWidth = 20, // 진행바 길이
+            partician_Length = 15, // 유닛 간 나누는 줄 길이
+            selectedIndex = 0, // 타겟 선택할 때 사용하는 인덱스
+            resultLoopCount = 5, // 결과창 보여주는 루프 횟수
+            loopDelay = 150; // 변화하는 것을 보여주기 위한 루프 사이의 딜레이
 
-        // private static bool monstersLoaded = false;//
+        // private static bool MonstersLoaded = false;//
 
         public Stage(string name, List<Monster> monsters)
         {
-            // if (!monstersLoaded)
+            // if (!MonstersLoaded)
             // {
-            //     string filePath = @"..\..\..\monsters.csv";
+            //     string filePath = @"..\..\..\Monsters.csv";
             //     //상대경로 수정필요
             //     MonsterFactory.LoadMonsters(filePath);
-            //     monstersLoaded = true;
+            //     MonstersLoaded = true;
             // }
 
             Name = name;
@@ -156,7 +187,7 @@ namespace TextRpg
             partician_Length += barWidth;
         }
 
-        internal void Start(Player player)
+        internal void Start()
         {
             AnsiConsole.MarkupLine($"=== {Name} 스테이지 시작 ===");
 
@@ -166,7 +197,7 @@ namespace TextRpg
 
             }
 
-            Battle(player, Monsters);
+            Battle();
 
 
             AnsiConsole.MarkupLine("계속하려면 아무 키나 누르세요...");
@@ -174,12 +205,12 @@ namespace TextRpg
         }
 
 
-        private void Battle(Player player, List<Monster> monsters)
+        private void Battle()
         {
             // 몬스터가 다 죽었을 때는 루프를 빠져나가서 보상을 받을 수 있도록 변경
             while (true)
             {
-                if (monsters.All(m => m.CurrentHP <= 0))
+                if (Monsters.All(m => m.CurrentHP <= 0))
                 {
                     // 모든 몬스터가 죽었으면 전투 종료하고 결과 화면으로 바로 넘어감
                     break;
@@ -189,13 +220,13 @@ namespace TextRpg
                 AnsiConsole.MarkupLine("Battle!!\n");
 
                 // 몬스터 목록 출력
-                for (int i = 0; i < monsters.Count; i++)
+                for (int i = 0; i < Monsters.Count; i++)
                 {
-                    PrintEnemy(monsters[i], i);
+                    PrintEnemy(Monsters[i], i, false);
                 }
 
-                // 플레이어 출력
-                PrintPlayer(player);
+                // 플레이어 출력(경험치 바는 제외)
+                PrintPlayer(false);
 
                 string[] battleMenus = new string[] { "1. 기본 공격", "2. 스킬 공격\n", "0. 도망" };
 
@@ -219,12 +250,12 @@ namespace TextRpg
                 // 선택지 선택에 따른 동작
                 if (index == 0)
                 {
-                    BasicAttack(player, monsters);
+                    BasicAttack();
                     continue;
                 }
                 else if (index == 1)
                 {
-                    SkillAttack(player, monsters);
+                    SkillAttack();
                     continue;
                 }
                 else if (index == 2)
@@ -232,14 +263,14 @@ namespace TextRpg
             }
 
             // 던전 클리어 결과창
-            Result(player, monsters);
+            Result();
         }
 
-        void PrintPlayer(Player player)
+        void PrintPlayer(bool isWithExpBar)
         {
             AnsiConsole.MarkupLine($"[#6cf540]{new string('-', partician_Length)}[/]");
             // 플레이어
-            AnsiConsole.Markup($"[yellow bold]{player.playerName}[/] ({player.playerClass}) Lv. {player.level}");
+            AnsiConsole.MarkupLine($"[yellow bold]{Program.player.playerName}[/] ({Program.player.playerClass}) Lv. {Program.player.level}");
             // HP바
             AnsiConsole
             .Progress()
@@ -255,12 +286,12 @@ namespace TextRpg
                 })
                 .Start(x =>
                 {
-                    var task = x.AddTask("[red]HP[/]");
-                    float percentage = (float)player.hp * 100 / player.maxHp;
+                    var task = x.AddTask("[red]HP [/]");
+                    float percentage = (float)Program.player.hp * 100 / Program.player.maxHp;
                     task.Increment(percentage);
                 });
             Console.SetCursorPosition(barWidth + 5, Console.GetCursorPosition().Top - 2);
-            AnsiConsole.MarkupLine($"[red]{player.hp}/{player.maxHp}[/]");
+            AnsiConsole.MarkupLine($"[red]{Program.player.hp}/{Program.player.maxHp}[/]" + new string(' ', (Program.player.maxHp.ToString().Length)));
 
             // MP바
             AnsiConsole
@@ -277,24 +308,60 @@ namespace TextRpg
                 })
                 .Start(x =>
                 {
-                    var task = x.AddTask("[blue]MP[/]");
-                    float percentage = (float)player.mana * 100 / player.maxMp;
+                    var task = x.AddTask("[blue]MP [/]");
+                    float percentage = (float)Program.player.mana * 100 / Program.player.maxMp;
                     task.Increment(percentage);
                 });
             // 진행바 오른쪽에 커스텀 텍스트를 표시할 방법이 없음.. 그럼 커서 옮기고 써주면 되는 거 아닌가?
             Console.SetCursorPosition(barWidth + 5, Console.GetCursorPosition().Top - 2);
-            AnsiConsole.MarkupLine($"[blue]{player.mana}/{player.maxMp}[/]\n");
-            Console.SetCursorPosition(0, Console.GetCursorPosition().Top - 1);
+            AnsiConsole.MarkupLine($"[blue]{Program.player.mana}/{Program.player.maxMp}[/]" + new string(' ', (Program.player.maxMp.ToString().Length)));
+
+            // Exp 바도 함께 출현
+            if(isWithExpBar)
+            {
+                // 경험치 바 (초록)
+                AnsiConsole
+                    .Progress()
+                    .Columns(
+                    // Column의 순서 변경 및 바 색상 변경
+                    new TaskDescriptionColumn(), // 설명
+                    new ProgressBarColumn
+                    {
+                        Width = barWidth, // 진행바 길이
+                        CompletedStyle = new Style(foreground: Color.FromHex("#6cf540")), // 채워진 부분 색상
+                        RemainingStyle = new Style(foreground: Color.FromHex("#62911A")), // 채워지지 않은 부분 색상
+                        FinishedStyle = new Style(foreground: Color.FromHex("#6cf540")), // 100% 일 때의 색상
+                    })
+                    .Start(x =>
+                    {
+                        var task = x.AddTask("[#6cf540]EXP[/]");
+                        double percentage = Program.player.exp * 100 / Program.player.maxExp;
+                        task.Increment(percentage);
+                    });
+                // 진행바 오른쪽에 커스텀 텍스트를 표시할 방법이 없음.. 그럼 커서 옮기고 써주면 되는 거 아닌가?
+                Console.SetCursorPosition(barWidth + 5, Console.GetCursorPosition().Top - 2);
+                AnsiConsole.MarkupLine($"[#6cf540]{Program.player.exp}/{Program.player.maxExp}[/]");
+            }
+            // 아래 구분선
             AnsiConsole.MarkupLine($"[#6cf540]{new string('-', partician_Length)}[/]\n");
         }
 
 
-        void PrintEnemy(Monster monster, int i)
+        void PrintEnemy(Monster monster, int i, bool isTarget)
         {
             var m = monster;
-            AnsiConsole.MarkupLine(m.IsAlive ? $"{new string('-', partician_Length)}" : $"[gray]{new string('-', partician_Length)}[/]");
+
+            // 타겟이라면 테두리를 다른 색으로 표시
+            if(isTarget)
+                AnsiConsole.MarkupLine($"[blue]{new string('-', partician_Length)}[/]");
+            else
+                AnsiConsole.MarkupLine(m.IsAlive ? $"{new string('-', partician_Length)}" : $"[gray]{new string('-', partician_Length)}[/]");
             // 적 정보
-            string status = m.IsAlive ? $"{i + 1}. {m.Name} Lv.{m.Level}" : $"[gray]{i + 1}. Lv.{m.Name} {m.Level} (Dead)[/]";
+            string status = "";
+            if (isTarget)
+                status = $"[blue]{i + 1}. {m.Name} Lv.{m.Level}[/]";
+            else
+                status = m.IsAlive ? $"{i + 1}. {m.Name} Lv.{m.Level}" : $"[gray]{i + 1}. Lv.{m.Name} {m.Level} (Dead)[/]";
             AnsiConsole.MarkupLine(status);
             // HP바
             AnsiConsole
@@ -311,117 +378,96 @@ namespace TextRpg
                 })
                 .Start(x =>
                 {
-                    string status = m.IsAlive ? $"[red]HP[/]" : "[gray]HP[/]";
+                    string status = m.IsAlive ? $"[red]HP [/]" : "[gray]HP [/]";
                     var task = x.AddTask(status);
-                    float percentage = (float)m.CurrentHP * 100 / m.MaxHP;
+                    double percentage = m.CurrentHP * 100 / m.MaxHP;
                     task.Increment(percentage);
                 });
             Console.SetCursorPosition(barWidth + 5, Console.GetCursorPosition().Top - 2);
-            AnsiConsole.MarkupLine(m.IsAlive ? $"[red]{m.CurrentHP}/{m.MaxHP}[/]\n" : $"[gray]{m.CurrentHP}/{m.MaxHP}[/]\n");
-            Console.SetCursorPosition(0, Console.GetCursorPosition().Top - 1);
-            AnsiConsole.MarkupLine(m.IsAlive ? $"{new string('-', partician_Length)}\n" : $"[gray]{new string('-', partician_Length)}[/]\n");
+            AnsiConsole.MarkupLine(m.IsAlive ? $"[red]{(int)m.CurrentHP}/{m.MaxHP}[/]" : $"[gray]{(int)m.CurrentHP}/{m.MaxHP}[/]" + new string(' ', (m.MaxHP.ToString().Length))); // 현재 HP의 자릿수가 바뀌었을 때 자릿수가 줄어들기에 제대로 덮어쓰지 못하는 경우 발생. 공백 써주기
+            // 타겟이라면 테두리를 다른 색으로 표시
+            if (isTarget)
+                AnsiConsole.MarkupLine($"[blue]{new string('-', partician_Length)}[/]");
+            else
+                AnsiConsole.MarkupLine(m.IsAlive ? $"{new string('-', partician_Length)}" : $"[gray]{new string('-', partician_Length)}[/]");
         }
 
 
-        void Result(Player player, List<Monster> monsters)
+        void Result()
         {
             int killCount = 0;
-            string panelHeader = "";
+            string resultTitle = "";
 
             // 전투 승리/패배에 따라
             // 처치한 몬스터에 따라 얻은 골드, 경험치 계산
-            if (player.hp > 0)
+            if (Program.player.hp > 0)
             {
                 _cleared = true;
 
                 int gold = 0,
-                    increasePerLoop_gold = 0,
-                    exp = 0,
-                    increasePerLoop_exp = 0,
-                    resultLoopCount = 0;
+                    exp = 0;
 
-                panelHeader += "[green]Victory[/]";
-                AnsiConsole.MarkupLine($"던전에서 몬스터 {monsters.Count}마리를 잡았습니다.");
-
+                resultTitle += "[bold #6cf540]Victory[/]";
                 // 모든 몬스터를 잡았기에 몬스터 수 전체를 잡은 수에 추가
-                killCount = monsters.Count;
+                killCount = Monsters.Count;
                 // 전투 승리시에만 처치한 몬스터들로부터 골드, 경험치 획득량 계산
-                for (int i = 0; i < monsters.Count; i++)
+                for (int i = 0; i < Monsters.Count; i++)
                 {
-                    gold += monsters[i].DropGold;
-                    exp += monsters[i].DropExp;
+                    gold += Monsters[i].DropGold;
+                    exp += Monsters[i].DropExp;
                 }
 
-                // 경험치,골드 획득!
-                player.gold += gold;
-                player.AddExp(exp);
-
-                // 결과창 보여주는 루프 횟수, 루프 당 값 상승량
-                resultLoopCount = 10;
-                increasePerLoop_gold = gold / resultLoopCount;
-                increasePerLoop_exp = exp / resultLoopCount;
-                // 보여주기 위한 초기화
-                gold = exp = 0;
+                // 골드 획득!
+                Program.player.gold += gold;
+                double expIncreasePerLoop = exp / resultLoopCount;
 
                 // 결과창의 숫자가 점점 증가하는 것을 보여주기 위한 루프
                 for (int i = 0; i < resultLoopCount; i++)
                 {
+                    // 이번 루프에서 표시를 위한 스텟 변화
+                    Program.player.mana = Math.Clamp(Program.player.mana + 1, 0, Program.player.maxMp); // 1씩 10번. 총 10 마나 회복
+                    Program.player.AddExp(expIncreasePerLoop); // 획득 경험치/loopCount 만큼씩 획득
+
                     // 패널 안에 들어갈 내용
                     string inPanel =
-                    $"Lv.{player.level} {player.playerName}\n" +
-                    $"HP {player.hp}/{player.maxHp}\n" +
-                    $"MP [blue]{++player.mana}[/]/{player.maxMp}\n\n" +
-                    $"  << 보상 >>\n" +
-                    $"골  드: +[yellow]{gold}[/] G\n" +
-                    $"경험치: +[yellow]{exp}[/] Exp";
+                    $"골  드: +[yellow]{gold * i / resultLoopCount}[/] G\n" +
+                    $"경험치: +[yellow]{expIncreasePerLoop * i}[/] Exp";
+                    
 
                     // 전투 승리 후 플레이어 마나 자연적으로 10 회복 // 루프당 1씩 회복되는 모습
                     // 드랍 아이템... 없다??? 없으면 아이템은 빼기
 
+                    // 바꾼 데이터를 표시
                     Console.Clear();
-                    AnsiConsole.MarkupLine("Battle!! = Result\n");
+                    AnsiConsole.MarkupLine("Battle!! - Result\n" + resultTitle);
+                    // 플레이어 출력
+                    PrintPlayer(true);
                     var panel = new Panel(inPanel); // 패널 생성 및 안에 들어갈 내용 
                                                     // 테두리 스타일(Rounded, Square, Ascii, None 등) Double, Heavy는 제대로 출력이 안되는 듯함
                     panel.Border = BoxBorder.Rounded;
                     // 패널 상단 중앙에 제목 적기(왼쪽, 오른쪽으로도 변경 가능)
-                    panel.Header = new PanelHeader(panelHeader, Justify.Center);
+                    panel.Header = new PanelHeader("<< 보상 >>", Justify.Center);
                     // 패널 출력
                     AnsiConsole.Write(panel);
                     
-                    // 다음 루프를 위한 더하기
-                    gold += increasePerLoop_gold;
-                    exp += increasePerLoop_exp;
-
                     // 숫자가 변하는 것을 보여주기 위한 딜레이
-                    Thread.Sleep(100);
+                    Thread.Sleep(loopDelay); // 딜레이가 너무 짧으면 깜빡이는 현상 심함.. 그렇다고 길게 하면 결과창이 루즈함.. 적당한 값으로 쓰기
                 }
             }
             else
             {
-                // 패널 헤더
-                panelHeader += "[red]You Lose[/]";
-                // 패널 안에 들어갈 내용
-                string inPanel =
-                $"Lv.{player.level} {player.playerName}\n" +
-                $"HP {player.hp}/{player.maxHp}\n" +
-                $"MP {player.mana}/{player.maxMp}";
-
+                resultTitle += "[bold red]You Lose[/]\n\n던전 공략에 실패하였습니다.";
                 Console.Clear();
-                AnsiConsole.MarkupLine("Battle!! = Result\n");
-                var panel = new Panel(inPanel); // 패널 생성 및 안에 들어갈 내용 
-                                                // 테두리 스타일(Rounded, Square, Ascii, None 등) Double, Heavy는 제대로 출력이 안되는 듯함
-                panel.Border = BoxBorder.Rounded;
-                // 패널 상단 중앙에 제목 적기(왼쪽, 오른쪽으로도 변경 가능)
-                panel.Header = new PanelHeader(panelHeader, Justify.Center);
-                // 패널 출력
-                AnsiConsole.Write(panel);
+                AnsiConsole.MarkupLine("Battle!! = Result\n" + resultTitle);
+                // 플레이어 출력
+                PrintPlayer(true);
 
                 // 처치한 몬스터 수만 카운트
                 if (Program.quest.Get_questData().ContainsKey(0))
                 {
-                    for (int i = 0; i < monsters.Count; i++)
+                    for (int i = 0; i < Monsters.Count; i++)
                     {
-                        if (!monsters[i].IsAlive)
+                        if (!Monsters[i].IsAlive)
                             killCount++;
                     }
                 }
@@ -429,112 +475,257 @@ namespace TextRpg
 
             // 퀘스트에 잡은 몬스터 수를 카운트
             Program.quest.QuestRenewal(0, killCount);
-
-
-            AnsiConsole.MarkupLine("\n0. 다음\n>>");
-            Console.ReadLine();
         }
-        private void BasicAttack(Player player, List<Monster> monsters)
-        {
 
-            Random rand = new Random();//플레이어에게 크리티컬 확률이없어 일시적으로 추가
+        // 플레이어의 공격력에 오차 +,- 10%를 주어 몬스터 방어력과 계산 후 최종 대미지를 산출하여 리턴
+        int damageError(double damageInit, int Monsterdef)
+        {
+            Random rand = new Random();
+
+            // 공격 시 오차 +,- 10% >> 공격력에 0.9~1.1 곱하기 >> 0.9~1.1 사이가 나오게끔 랜덤
+            // rand.NextDouble() = 0~1 사이 값 랜덤
+            // 최소값 0.9에 0~0,2 사이 랜덤값을 더하면 0.9~1.1 랜덤
+            double error = 0.9 + rand.NextDouble() * 0.2;
+            // 오차로 인해 발생한 소숫점은 올림 처리
+            int atk_withError = (int)(Math.Ceiling(error * damageInit));
+            // 방어력이 공격력보다 높아도 적어도 1의 대미지가 들어가게끔 조치
+            int damage = Math.Max(1, (atk_withError - Monsterdef));
+
+            return damage;
+        }
+
+        void SelectTarget()
+        {
+            // 타겟 선택 루프
+            while (true)
+            {
+                Console.Clear();
+                AnsiConsole.MarkupLine("=== 공격할 대상을 선택하세요 ===\n");
+
+                // 몬스터 리스트 출력
+                for (int i = 0; i < Monsters.Count; i++)
+                {
+                    var m = Monsters[i];
+                    // 해당 몬스터가 지금 타겟이라면
+                    if (selectedIndex == i)
+                    {
+                        // 살아있다면, 타겟 표시
+                        if (m.IsAlive)
+                            PrintEnemy(m, i, true);
+                        // 죽었다면, 표시(내부적으로 죽음 표시 처리)하고 다음 타겟으로
+                        else
+                        {
+                            PrintEnemy(m, i, false);
+                            selectedIndex++;
+                        }
+                    }
+                    // 타겟이 아니라면 표시
+                    else
+                        PrintEnemy(m, i, false);
+                }
+                // 플레이어 출력
+                PrintPlayer(false);
+                if (selectedIndex == Monsters.Count)
+                    AnsiConsole.Markup("[blue]취소[/]");
+                else
+                    AnsiConsole.Markup("취소");
+
+                // 선택지
+                ConsoleKey enter = Console.ReadKey().Key;
+
+                if (enter == ConsoleKey.Enter || enter == ConsoleKey.Spacebar)
+                {
+                    if (selectedIndex == Monsters.Count)
+                        return;
+                    else
+                        break; // selectedIndex 값을 가지고 타겟 선택 루프를 빠져나가도록
+                }
+                else if (enter == ConsoleKey.UpArrow)
+                {
+                    while (true)
+                    {
+                        // 한칸 위를 가리키도록
+                        --selectedIndex;
+                        // 0번째(첫 몬스터)에서 방향키를 위로 눌렀다면
+                        if (selectedIndex < 0)
+                        {
+                            // 취소 항목 가리키고 루프 종료
+                            selectedIndex = Monsters.Count;
+                            break;
+                        }
+                        // 한칸 위의 몬스터가 살아있다면 루프 종료
+                        else if (Monsters[selectedIndex].IsAlive)
+                            break;
+                        // 죽은 몬스터를 가르켰다면 루프 다시
+                    }
+                }
+                else if (enter == ConsoleKey.DownArrow)
+                {
+                    while (true)
+                    {
+                        // 한칸 아래를 가리키도록
+                        ++selectedIndex;
+                        // 취소 항목에서 아래 방향키를 눌렀다면
+                        if (selectedIndex > Monsters.Count)
+                            // 첫 항목으로
+                            selectedIndex = 0;
+
+                        // Monsters.Count 는 취소 버튼 인덱스라서 따로 처리. 취소 버튼 가리키고 루프 종료
+                        if (selectedIndex == Monsters.Count)
+                            break;
+                        // 한칸 아래의 몬스터가 살아있다면 루프 종료
+                        else if (Monsters[selectedIndex].IsAlive)
+                            break;
+                        // 죽은 몬스터를 가리켰다면 다시 루프
+                    }
+                }
+            }
+        }
+
+        // 기본 공격
+        private void BasicAttack()
+        {
+            // 타겟 초기화
+            selectedIndex = 0;
+
+            // 타겟 선택
+            SelectTarget();
+
+            // 취소를 선택했다면, 공격을 수행하지 않고 리턴
+            if (selectedIndex == Monsters.Count)
+                return;
+
+            // 타겟 지정
+            Monster target = Monsters[selectedIndex];
+
+            // 공격 수행
+            // 플레이어의 공격력에 오차 +,- 10%를 주어 몬스터 방어력과 계산 후 대미지 산출
+            int damage = damageError(Program.player.totalPower, target.Defense),
+                finalDamage = 0;
+            // 회피, 치명 랜덤
+            Random rand = new Random();
             int crit = rand.Next(1, 101);
             int eva = rand.Next(1, 101);
-
-            Console.Clear();
-            AnsiConsole.MarkupLine("=== 공격할 대상을 선택하세요 ===\n");
-
-            // 몬스터 리스트 출력
-            for (int i = 0; i < monsters.Count; i++)
+            string panelHeader = $"< {Program.player.playerName} 의 공격! >"; // 전투 패널 헤더
+            string message = ""; // 전투 패널에 들어갈 메시지
+            bool isEvade = false; // 회피 여부
+            // 기억할 커서 위치
+            int left_target = 0,
+                top_target = 0,
+                left_end = 0,
+                top_end = 0;
+            // 회피
+            if (eva <= 10)
             {
-                var m = monsters[i];
-                string status = m.CurrentHP <= 0 ? "Dead" : $"HP {m.CurrentHP}";
-                AnsiConsole.MarkupLine($"{i + 1}. Lv.{m.Level} {m.Name} - {status}");
+                message += $"Lv.{target.Level} {target.Name} 은 공격을 피했습니다.";
+                isEvade = true;
             }
-
-            AnsiConsole.MarkupLine("\n0. 취소");
-            Console.Write(">> ");
-            string input = Console.ReadLine();
-
-            if (input == "0") return;
-
-            if (!int.TryParse(input, out int index) || index < 1 || index > monsters.Count)
+            // 크리티컬 판정 및 대미지 처리
+            else
             {
-                AnsiConsole.MarkupLine("잘못된 입력입니다.");
-                Console.ReadKey();
-                return;
-            }
+                bool isCritical = crit <= Program.player.criticalChance;
+                finalDamage = isCritical ? (int)(damage * 1.6) : damage;
+                //target.Hit(finalDamage);
 
-            Monster target = monsters[index - 1];
-
-            if (!target.IsAlive)
-            {
-                AnsiConsole.MarkupLine("이미 쓰러진 몬스터입니다.");
-                Console.ReadKey();
-                return;
+                message += isCritical 
+                    ? $"Lv.{target.Level} {target.Name} 을(를) 공격했습니다. [[데미지 : [red]{finalDamage}[/]]] - [red]치명타 공격!![/]"
+                    : $"Lv.{target.Level} {target.Name} 을(를) 공격했습니다. [[데미지 : [yellow]{finalDamage}[/]]]";
             }
 
             Console.Clear();
             AnsiConsole.MarkupLine("Battle!!\n");
-
-            //int damage = (int)(player.totalPower * (100f / (100 + target.Defense)));
-            //damage = Math.Max(3, damage); //-> 데미지가 너무약하면 아래 코드 주석처리하고 이코드 풀어서 사용하세요
-            int damage = Math.Max(1, (int)(player.totalPower - target.Defense));
-
-            // 공격 처리
-            if (eva <= 10)
+            // 몬스터 출력
+            for (int j = 0; j < Monsters.Count; j++)
             {
-                AnsiConsole.MarkupLine($"{player.playerName} 의 공격!");
-                AnsiConsole.MarkupLine($"Lv.{target.Level} {target.Name} 을(를) 공격했지만 아무일도 일어나지 않았습니다.");
-            }
-            else
-            {
-                bool isCritical = crit <= player.criticalChance;
-                int finalDamage = isCritical ? (int)(damage * 1.6) : damage;
-                target.Hit(finalDamage);
-
-                AnsiConsole.MarkupLine($"{player.playerName} 의 공격!");
-                AnsiConsole.MarkupLine(isCritical ? $"Lv.{target.Level} {target.Name} 을(를) 맞혔습니다. [[데미지 : {finalDamage}]] - 치명타 공격!!"
-                    : $"Lv.{target.Level} {target.Name} 을(를) 맞혔습니다. [[데미지 : {finalDamage}]]");
-            }
-
-
-            //여기에 데미지 처리
-            if (!target.IsAlive)
-                AnsiConsole.MarkupLine($"\nLv.{target.Level} {target.Name}\nHP {target.MaxHP} -> Dead");
-            else
-                AnsiConsole.MarkupLine($"\nLv.{target.Level} {target.Name}\nHP {target.CurrentHP}");
-
-            AnsiConsole.MarkupLine("\n0. 다음\n>>");
-            Console.ReadLine();
-
-            // 살아있는 몬스터들의 반격
-            if (monsters.All(m => m.CurrentHP <= 0))
-            {
-                Console.Clear();
-                AnsiConsole.MarkupLine("모든 몬스터를 처치했습니다!");
-                Console.ReadKey();
-                return; // 함수 종료
-            }
-
-            Console.Clear();
-            MonsterCounterAttack(player, monsters);
-        }
-
-        private void SkillAttack(Player player, List<Monster> monsters)
-        {
-            Console.Clear();
-
-            // 1. 직업 스킬 목록 뽑기
-            List<Skill> jobSkills = new List<Skill>();
-            foreach (var skill in Skill.SkillList.Values)
-            {
-                if (skill.Job == player.playerClass)
+                // 타겟 몬스터를 표현하기 시작하는 커서 위치 기억
+                if (j == selectedIndex)
                 {
-                    jobSkills.Add(skill);
+                    left_target = Console.GetCursorPosition().Left;
+                    top_target = Console.GetCursorPosition().Top;
+                }
+                PrintEnemy(Monsters[j], j, false);
+            }
+            // 플레이어 출력
+            PrintPlayer(false);
+            // 공격 메세지 출력
+            var panel = new Panel(message);
+            panel.Border = BoxBorder.Rounded;
+            // 패널 상단 중앙에 제목 적기(왼쪽, 오른쪽으로도 변경 가능)
+            panel.Header = new PanelHeader(panelHeader, Justify.Center);
+            // 패널 출력
+            AnsiConsole.Write(panel);
+            // 모든 메세지의 출력이 끝난 위치를 기억
+            left_end = Console.GetCursorPosition().Left;
+            top_end = Console.GetCursorPosition().Top;
+
+            // 회피하지 않았다면
+            if (!isEvade)
+            {
+                // 화면에 공격 결과 표시
+                for (int i = 0; i < resultLoopCount; i++)
+                {
+                    // 피해량을 loop 횟수만큼 나누어서 쭈우욱 HP바가 감소하는 느낌
+                    target.Hit(finalDamage / resultLoopCount);
+                    // 타겟 몬스터의 상태를 써주는 위치로 커서 이동
+                    Console.SetCursorPosition(left_target, top_target);
+                    // 타겟 몬스터의 HP 감소를 덮어써줌
+                    PrintEnemy(Monsters[selectedIndex], selectedIndex, false);
+
+                    // 사망 시 메세지 출현하고 루프 종료
+                    if (!target.IsAlive)
+                    {
+                        // 출현한 메세지 뒤로 커서 이동
+                        Console.SetCursorPosition(left_end, top_end);
+                        // 적 사망 메세지 출현
+                        AnsiConsole.MarkupLine($"{selectedIndex+1}. {target.Name} Lv.{target.Level} 은(는) 쓰러졌습니다.");
+                        // 커서 위치 경신
+                        left_end = Console.GetCursorPosition().Left;
+                        top_end = Console.GetCursorPosition().Top;
+                        break;
+                    }
+
+                    // 체력이 깎이는 과정을 보여주기 위한 딜레이
+                    Thread.Sleep(loopDelay);
                 }
             }
 
+            // 출현한 메세지 뒤로 커서 이동
+            Console.SetCursorPosition(left_end, top_end);
+            // 몬스터 모두 처치했는지 확인
+            if (Monsters.All(m => m.IsAlive == false))
+            {
+                AnsiConsole.Prompt(new SelectionPrompt<string>().AddChoices("[#6cf540]모든 몬스터를 처치했습니다![/]\n"));
+                return; // 함수 종료
+            }
+            else
+                AnsiConsole.Prompt(new SelectionPrompt<string>().AddChoices("다음\n"));
+
+            Console.Clear();
+            MonsterCounterAttack();
+        }
+
+        void PrintSkill(bool isSelected)
+        {
+            var panel = new Panel("[yellow]던전 뿌셔[/]\n\n<< 보상 >>\n경험치: +100 Exp\n골드: +1000G\n\n아이템\n스파르타 무언가"); // 패널 생성 및 안에 들어갈 내용
+            // 테두리 스타일(Rounded, Square, Ascii, None 등) Double, Heavy는 제대로 출력이 안되는 듯함
+            panel.Border = BoxBorder.Rounded;
+            // 패널 상단 중앙에 제목 적기(왼쪽, 오른쪽으로도 변경 가능)
+            panel.Header = new PanelHeader("[yellow bold]퀘스트 완료[/]", Justify.Center);
+            if()
+            panel.BorderColor(Color.Blue);
+            // 패널 출력
+            AnsiConsole.Write(panel);
+        }
+
+        private void SkillAttack()
+        {
+            // 타겟 초기화
+            selectedIndex = 0;
+            Console.Clear();
+            // 1. 직업 스킬 목록 뽑기
+            List<Skill> jobSkills = SkillFactory.GetSkillsByJob(Program.player.playerClass);
+            
+            // 스킬이 없다면
             if (jobSkills.Count == 0)
             {
                 AnsiConsole.MarkupLine("사용 가능한 스킬이 없습니다.");
@@ -543,7 +734,7 @@ namespace TextRpg
             }
 
             // 2. 스킬 선택
-            AnsiConsole.MarkupLine($"{player.playerClass}의 사용 가능한 스킬 목록:");
+            AnsiConsole.MarkupLine($"{Program.player.playerClass}의 사용 가능한 스킬 목록:");
             for (int i = 0; i < jobSkills.Count; i++)
             {
                 var s = jobSkills[i];
@@ -562,7 +753,7 @@ namespace TextRpg
             Skill chosenSkill = jobSkills[selected - 1];
 
             // 3. 마나 체크
-            if (player.mana < chosenSkill.ManaCost)
+            if (Program.player.mana < chosenSkill.ManaCost)
             {
                 AnsiConsole.MarkupLine("마나가 부족합니다.");
                 Console.ReadKey();
@@ -570,15 +761,15 @@ namespace TextRpg
             }
 
             // 4. 마나 차감
-            player.mana -= chosenSkill.ManaCost;
+            Program.player.mana -= chosenSkill.ManaCost;
 
             // 5. 전체 몬스터 공격
             Console.Clear();
-            AnsiConsole.MarkupLine($"{player.playerName}의 [[{chosenSkill.Name}]] 발동!");
+            AnsiConsole.MarkupLine($"{Program.player.playerName}의 [[{chosenSkill.Name}]] 발동!");
             Thread.Sleep(1000);
 
-            int skillDamage = player.SkillPower(chosenSkill);
-            foreach (var monster in monsters)
+            int skillDamage = Program.player.SkillPower(chosenSkill);
+            foreach (var monster in Monsters)
             {
                 if (monster.CurrentHP <= 0)
                 {
@@ -599,46 +790,70 @@ namespace TextRpg
             Console.ReadKey();
             Console.Clear();
 
-            if (monsters.All(m => m.CurrentHP <= 0))
+            if (Monsters.All(m => m.CurrentHP <= 0))
             {
-                Console.Clear();
                 AnsiConsole.MarkupLine("모든 몬스터를 처치했습니다!");
                 Console.ReadKey();
                 return; // 함수 종료
             }
 
-            MonsterCounterAttack(player, monsters);
-
+            // 몬스터의 반격 페이즈
+            MonsterCounterAttack();
         }
 
-        private void MonsterCounterAttack(Player player, List<Monster> monsters)
+        private void MonsterCounterAttack()
         {
-            // 반격할 몬스터가 없는데 반격하는 경우 발생
+            // 반격할 몬스터가 없는데 반격하는 경우 방지
             if (Monsters.All(m => m.IsAlive == false))
                 return;
 
-            AnsiConsole.MarkupLine("몬스터가 반격합니다!!\n");
-            foreach (var m in monsters)
+            Console.Clear();
+            AnsiConsole.MarkupLine("[red]몬스터가 반격합니다!![/]\n");
+            // 몬스터들 출력
+            for (int i = 0; i < Monsters.Count; i++)
             {
+                PrintEnemy(Monsters[i], i, false);
+            }
+
+            // 플레이어를 써주기 시작할 때의 커서 좌표
+            int left = Console.GetCursorPosition().Left,
+                top = Console.GetCursorPosition().Top;
+
+            List<string>[] counterMessages = new List<string>[2] { new List<string>(), new List<string>()};
+            for(int j = 0; j < Monsters.Count; j++)
+            {
+                var m = Monsters[j];
                 if (m.CurrentHP > 0)
                 {
-                    int retaliation = Math.Max(1, m.Attack - player.totalDefense);
-                    player.hp -= retaliation;
+                    // 대미지 계산
+                    int retaliation = Math.Max(1, m.Attack - Program.player.totalDefense);
+                    Program.player.hp -= retaliation;
 
-                    AnsiConsole.MarkupLine($"Lv.{m.Level} {m.Name} 의 공격!");
-                    AnsiConsole.MarkupLine($"{player.playerName} 을(를) 맞혔습니다. [[데미지 : {retaliation}]]");
-                    AnsiConsole.MarkupLine($"\nLv.{player.level} {player.playerName}\nHP {player.hp + retaliation} → {player.hp}\n");
+                    counterMessages[0].Add($"< {j+1}. {m.Name} Lv.{m.Level} 의 공격! >");
+                    counterMessages[1].Add($"{Program.player.playerName} 을(를) 공격했습니다. [[데미지 : [red]{retaliation}[/]]]\n[yellow bold]{Program.player.playerName}[/] ({Program.player.playerClass}) Lv. {Program.player.level}\nHP [#6cf540]{Program.player.hp + retaliation}[/] → [#6cf540]{Program.player.hp}[/]");
 
+                    Console.SetCursorPosition(left, top);
+                    PrintPlayer(false);
+                    // 몬스터 공격 텍스트 패널 출력
+                    for (int i = 0; i < counterMessages[0].Count; i++)
+                    {
+                        var panel = new Panel(counterMessages[1][i]);
+                        panel.Border = BoxBorder.Rounded;
+                        // 패널 상단 중앙에 제목 적기(왼쪽, 오른쪽으로도 변경 가능)
+                        panel.Header = new PanelHeader(counterMessages[0][i], Justify.Center);
+                        // 패널 출력
+                        AnsiConsole.Write(panel);
+                    }
+
+                    // 플레이어가 사망하면 계산 종료하고 던전 빠져나가게끔
+                    if (Program.player.hp <= 0)
+                        return;
+
+                    // 다음 몬스터 공격까지 딜레이
                     Thread.Sleep(500);
-
-
-
-                    if (player.hp <= 0)
-                        break;
                 }
             }
-            Console.Write("넘어가시려면 아무키나 눌러주세요");
-            Console.ReadKey();
+            AnsiConsole.Prompt(new SelectionPrompt<string>().AddChoices("다음\n"));
         }
     }
 }

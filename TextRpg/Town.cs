@@ -82,7 +82,7 @@ namespace TextRpg
                         shop.DisplayItems(inventory);
                         break;
                     case 4:
-                        dungeon.EnterDungeonMenu(player);
+                        dungeon.EnterDungeonMenu();
                         break;
                     case 5:
                         rest.DisplayRestMenu(player);

@@ -32,6 +32,9 @@ namespace TextRpg
         public int EquippedWeaponIndex { get; set; } = -1;
         public int EquippedArmorIndex { get; set; } = -1;
 
+        // 최고 스테이지 클리어 저장
+        public int HighestClearedStage { get; set; } = 0; // 기본값은 0 (아직 클리어한 스테이지 없음)
+
         public PlayerData() { }
 
         // Player 객체에서 데이터 추출
@@ -55,6 +58,9 @@ namespace TextRpg
             // 포션 정보 저장
             HealthPotionCount = player.HealthPotion.Quantity;
             ManaPotionCount = player.ManaPotion.Quantity;
+
+            // 최고 스테이지 저장
+            HighestClearedStage = player.highestClearedStage;
         }
 
         // PlayerData 객체를 Player 객체에 적용
@@ -88,6 +94,9 @@ namespace TextRpg
                     break;
                 }
             }
+
+            // 최고 스테이지 정보 복원
+            player.highestClearedStage = HighestClearedStage;
         }
     }
 }

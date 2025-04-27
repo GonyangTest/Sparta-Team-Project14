@@ -27,6 +27,7 @@ namespace TextRpg
         public int agility;
         public int criticalChance;
         public Job SelectedJob;
+        public int highestClearedStage = 0; // 최고 스테이지 저장
 
         public ConsumableItem HealthPotion = ItemFactory.CreateConsumableItem(GameConstance.Item.HEALTH_POTION_NAME, 3);
         public ConsumableItem ManaPotion = ItemFactory.CreateConsumableItem(GameConstance.Item.MANA_POTION_NAME, 3);
@@ -224,6 +225,7 @@ namespace TextRpg
                 statTable.AddRow("[white]민첩[/]", $"{agility}");
                 statTable.AddRow("[white]치명타확률[/]", $"{criticalChance}%");
                 statTable.AddRow("[white]골드[/]", $"{gold} G");
+                statTable.AddRow("[white]최고 스테이지[/]",$"{highestClearedStage}단계");
                 AnsiConsole.Write(statTable);
 
                 // 장비 테이블 생성

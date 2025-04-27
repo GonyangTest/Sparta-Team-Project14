@@ -26,21 +26,17 @@ namespace TextRpg
         {
             bool isRunning = true;
             List<string> menu = new List<string>()
-    {
-        "1. 아이템 구매",
-        "2. 아이템 판매",
-        "0. 나가기"
-    };
+            {
+                "1. 아이템 구매",
+                "2. 아이템 판매",
+                "0. 나가기"
+            };
 
             while (isRunning)
             {
                 Console.Clear();
-
+                
                 // FigletText를 사용하여 큰 타이틀 텍스트 생성 및 금색으로 설정
-                var title = new FigletText("상점")
-                    .Color(Color.Gold1);
-                AnsiConsole.Write(title);
-
                 // Rule로 꾸며진 구분선 생성
                 AnsiConsole.Write(new Rule("[yellow]필요한 아이템을 얻을 수 있는 상점입니다[/]").RuleStyle("gold1"));
                 AnsiConsole.WriteLine();
@@ -63,16 +59,20 @@ namespace TextRpg
                 // 각 아이템을 테이블 행으로 추가
                 foreach (Item item in _items.Where(i => i != null))
                 {
-                    string itemType = item is ConsumableItem ? "소비품" :
-                                    item is Weapon ? "무기" : "방어구";
-
+                    string itemType = "";
                     string effect = "";
-                    if (item is Weapon weapon)
-                        effect = $"+공격력 {weapon._attack}";
-                    else if (item is Armor armor)
-                        effect = $"+방어력 {armor._defense}";
-                    else if (item is ConsumableItem consumable)
+                    if (item is Weapon weapon){
+                        itemType = "무기";
+                        effect = $"+공격력 {weapon.Attack}";
+                    }
+                    else if (item is Armor armor){
+                        itemType = "방어구";
+                        effect = $"+방어력 {armor.Defense}";
+                    }
+                    else if (item is ConsumableItem consumable){
+                        itemType = "소비품";
                         effect = consumable.ItemName.Contains("체력") ? "HP 회복" : "MP 회복";
+                    }
 
                     string status = item.IsPurchased ? "[red]구매완료[/]" : "[green]구매가능[/]";
 
@@ -120,11 +120,6 @@ namespace TextRpg
             while (true)
             {
                 Console.Clear();
-
-                // 구매 화면 타이틀 (초록색으로 설정)
-                var title = new FigletText("구매")
-                    .Color(Color.Green);
-                AnsiConsole.Write(title);
 
                 // 구분선 추가
                 AnsiConsole.Write(new Rule("[green]번호를 눌러 아이템을 구매하세요[/]"));
@@ -186,12 +181,7 @@ namespace TextRpg
                     inventory.getInventory().Add(selectedItem);
 
                     // 구매 과정 애니메이션 효과
-                    AnsiConsole.Status()
-                        .Spinner(Spinner.Known.Star) // 별 모양 스피너
-                        .SpinnerStyle(Style.Parse("green"))
-                        .Start("구매 처리 중...", ctx => {
-                            Thread.Sleep(800); // 처리 중인 효과를 위한 지연
-                        });
+                    ShowSpinnerAnimation(Spinner.Known.Star, "green", "구매 처리 중...");
 
                     AnsiConsole.MarkupLine($"[green]{selectedItem.ItemName}을(를) 구매했습니다![/]");
                     AnsiConsole.Write(new Markup($"[grey]현재 골드: [gold1]{_player.gold} G[/][/]"));
@@ -222,12 +212,6 @@ namespace TextRpg
             }
 
             Console.Clear();
-
-            // 판매 화면 타이틀 (빨간색으로 설정)
-            var title = new FigletText("판매")
-                .Color(Color.Red);
-            AnsiConsole.Write(title);
-
             AnsiConsole.Write(new Rule("[red]번호를 입력해 아이템을 판매하세요[/]"));
             AnsiConsole.WriteLine();
 
@@ -247,7 +231,7 @@ namespace TextRpg
                         // 각 아이템 정보에 색상과 아이콘 추가
                         if (item == null) return "[blue]뒤로가기[/]";
 
-                        int sellPrice = (int)(item.Price * 0.85);
+                        int sellPrice = (int)(item.Price * GameConstance.Item.SELL_ITEM_PRICE_MULTIPLIER);
                         string itemType = item is Weapon ? "[orange3](무기)[/]" :
                                          item is Armor ? "[blue](방어구)[/]" : "[green](소비품)[/]";
 
@@ -259,7 +243,7 @@ namespace TextRpg
 
             if (selectedItem != null)
             {
-                int sellPrice = (int)(selectedItem.Price * 0.85);
+                int sellPrice = (int)(selectedItem.Price * GameConstance.Item.SELL_ITEM_PRICE_MULTIPLIER);
 
                 // 판매 정보를 테이블로 표시
                 var table = new Table()
@@ -281,24 +265,13 @@ namespace TextRpg
                     if (selectedItem == _player.EquippedWeapon)
                     {
                         // 해제 과정 애니메이션 효과
-                        AnsiConsole.Status()
-                            .Spinner(Spinner.Known.Star) // 별 모양 스피너
-                            .SpinnerStyle(Style.Parse("yellow"))
-                            .Start("장비 해제 중...", ctx => {
-                                Thread.Sleep(800); // 처리 중인 효과를 위한 지연
-                            });
+                        ShowSpinnerAnimation(Spinner.Known.Star, "yellow", "장비 해제 중...");
                         _player.EquippedWeapon = null;
                         AnsiConsole.MarkupLine($"[yellow]{selectedItem.ItemName}을(를) 해제했습니다. (무기)[/]");
                     }
                     else if (selectedItem == _player.EquippedArmor)
                     {
-                        // 해제 과정 애니메이션 효과
-                        AnsiConsole.Status()
-                            .Spinner(Spinner.Known.Star) // 별 모양 스피너
-                            .SpinnerStyle(Style.Parse("yellow"))
-                            .Start("장비 해제 중...", ctx => {
-                                Thread.Sleep(800); // 처리 중인 효과를 위한 지연
-                            });
+                        ShowSpinnerAnimation(Spinner.Known.Star, "yellow", "장비 해제 중...");
                         _player.EquippedArmor = null;
                         AnsiConsole.MarkupLine($"[yellow]{selectedItem.ItemName}을(를) 해제했습니다. (방어구)[/]");
                     }
@@ -311,12 +284,7 @@ namespace TextRpg
                     }
 
                     // 판매 처리 애니메이션
-                    AnsiConsole.Status()
-                        .Spinner(Spinner.Known.Dots) // 점 애니메이션
-                        .SpinnerStyle(Style.Parse("red"))
-                        .Start("판매 중...", ctx => {
-                            Thread.Sleep(1000); // 판매 처리 중 효과
-                        });
+                    ShowSpinnerAnimation(Spinner.Known.Dots, "red", "판매 중...");
 
                     // 아이템 판매 처리
                     inventory.RemoveItem(selectedItem);
@@ -331,6 +299,16 @@ namespace TextRpg
             AnsiConsole.WriteLine();
             AnsiConsole.Write(new Rule("[blue]계속하려면 아무 키나 누르세요...[/]"));
             Console.ReadKey();
+        }
+
+        private void ShowSpinnerAnimation(Spinner spinner, string color, string message)
+        {
+            AnsiConsole.Status()
+                .Spinner(spinner)
+                .SpinnerStyle(Style.Parse("yellow"))
+                .Start(message, ctx => {
+                    Thread.Sleep(GameConstance.Inventory.ITEM_EQUIP_SLEEP);
+            });
         }
 
         public List<Item> GetItems()

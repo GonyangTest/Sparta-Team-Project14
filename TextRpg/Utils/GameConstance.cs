@@ -97,5 +97,10 @@ namespace TextRpg
         {
             public const int ITEM_EQUIP_SLEEP = 800;
         }
+
+        public static class Shop
+        {
+            public const int ITEM_SELL_SLEEP = 1000;
+        }
     }
 }

@@ -408,9 +408,8 @@ namespace TextRpg
                     Program.player.AddExp(expIncreasePerLoop); // 획득 경험치/loopCount 만큼씩 획득
 
                     // 패널 안에 들어갈 내용
-                    string inPanel =
-                    $"골  드: +[yellow]{gold * i / resultLoopCount}[/] G\n" +
-                    $"경험치: +[yellow]{expIncreasePerLoop * i}[/] Exp";
+                    string inPanel = $"골  드: +[yellow]{gold * (i + 1) / resultLoopCount}[/] G\n" +
+                                  $"경험치: +[yellow]{expIncreasePerLoop * (i + 1)}[/] Exp";
 
 
                     // 전투 승리 후 플레이어 마나 자연적으로 10 회복 // 루프당 1씩 회복되는 모습
@@ -933,8 +932,8 @@ namespace TextRpg
                     Console.SetCursorPosition(0, top_BattleTxt);
                     string panelHeader = $"< {Program.player.playerName} 의 공격! >"; // 전투 패널 헤더
                     string message = isCritical
-                        ? $"Lv.{Monsters[selectedIndex].Level} {Monsters[selectedIndex].Name} 을(를) 공격했습니다.\n[[데미지 : [red]{finalDamage}[/]]] - [red]치명타 공격!![/]"
-                        : $"Lv.{Monsters[selectedIndex].Level} {Monsters[selectedIndex].Name} 을(를) 공격했습니다.\n[[데미지 : [yellow]{finalDamage}[/]]]";
+                        ? $"Lv.{Monsters[i].Level} {Monsters[i].Name} 을(를) 공격했습니다.\n[[데미지 : [red]{finalDamage}[/]]] - [red]치명타 공격!![/]"
+                        : $"Lv.{Monsters[i].Level} {Monsters[i].Name} 을(를) 공격했습니다.\n[[데미지 : [yellow]{finalDamage}[/]]]";
                     // 공격 메세지 출력
                     var panel = new Panel(message);
                     panel.Border = BoxBorder.Rounded;

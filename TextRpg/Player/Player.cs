@@ -202,11 +202,10 @@ namespace TextRpg
 
         public string PrintPlayer()
         {
-                AnsiConsole.MarkupLine("[yellow]상태보기[/]\n");
-                AnsiConsole.MarkupLine("캐릭터의 정보가 표시됩니다.\n");
+            AnsiConsole.Write(new Rule("[green]캐릭터의 정보를 볼수 있는 상태창입니다[/]"));
 
-                // 테이블 생성 및 설정
-                var statTable = new Table();
+            // 테이블 생성 및 설정
+            var statTable = new Table();
                 statTable.Border = TableBorder.Rounded;
                 
                 // 테이블 컬럼 추가

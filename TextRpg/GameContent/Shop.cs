@@ -280,11 +280,25 @@ namespace TextRpg
                     // 아이템이 장착 중이라면 해제
                     if (selectedItem == _player.EquippedWeapon)
                     {
+                        // 해제 과정 애니메이션 효과
+                        AnsiConsole.Status()
+                            .Spinner(Spinner.Known.Star) // 별 모양 스피너
+                            .SpinnerStyle(Style.Parse("yellow"))
+                            .Start("장비 해제 중...", ctx => {
+                                Thread.Sleep(800); // 처리 중인 효과를 위한 지연
+                            });
                         _player.EquippedWeapon = null;
                         AnsiConsole.MarkupLine($"[yellow]{selectedItem.ItemName}을(를) 해제했습니다. (무기)[/]");
                     }
                     else if (selectedItem == _player.EquippedArmor)
                     {
+                        // 해제 과정 애니메이션 효과
+                        AnsiConsole.Status()
+                            .Spinner(Spinner.Known.Star) // 별 모양 스피너
+                            .SpinnerStyle(Style.Parse("yellow"))
+                            .Start("장비 해제 중...", ctx => {
+                                Thread.Sleep(800); // 처리 중인 효과를 위한 지연
+                            });
                         _player.EquippedArmor = null;
                         AnsiConsole.MarkupLine($"[yellow]{selectedItem.ItemName}을(를) 해제했습니다. (방어구)[/]");
                     }

@@ -28,8 +28,7 @@ namespace TextRpg
             while (true)
             {
                 Console.Clear();
-                Console.WriteLine("인벤토리\n보유 중인 아이템을 관리할 수 있습니다.\n");
-                Console.WriteLine("[아이템 목록]");
+                AnsiConsole.Write(new Rule("[green]보유중인 아이템을 관리할수 있는 인벤토리입니다[/]"));
 
                 for (int i = 0; i < _inventory.Count; i++)
                 {
@@ -80,8 +79,8 @@ namespace TextRpg
             while (true)
             {
                 Console.Clear();
-                Console.WriteLine("인벤토리 - 장착 관리\n보유 중인 아이템을 관리할 수 있습니다.\n");
-                
+                AnsiConsole.Write(new Rule("[red]장착/해제[/][green]할 아이템을 선택하세요[/]"));
+
                 // 취소 옵션을 포함하기 위해 아이템 목록에 null 추가
                 var itemChoices = new List<Item>(_inventory);
                 itemChoices.Add(null); // 나가기 옵션
@@ -89,7 +88,6 @@ namespace TextRpg
                 // Spectre.Console의 SelectionPrompt 사용
                 var selectedItem = AnsiConsole.Prompt(
                     new SelectionPrompt<Item>()
-                        .Title("[green]장착/해제[/]할 아이템을 선택하세요")
                         .PageSize(10)
                         .AddChoices(itemChoices)
                         .WrapAround()
@@ -120,11 +118,25 @@ namespace TextRpg
                 {
                     if (player.EquippedWeapon == selectedItem)
                     {
+                        // 해제 과정 애니메이션 효과
+                        AnsiConsole.Status()
+                            .Spinner(Spinner.Known.Star) // 별 모양 스피너
+                            .SpinnerStyle(Style.Parse("yellow"))
+                            .Start("장비 해제 중...", ctx => {
+                                Thread.Sleep(800); // 처리 중인 효과를 위한 지연
+                            });
                         player.EquippedWeapon = null;
                         AnsiConsole.MarkupLine($"[green]{selectedItem.ItemName}[/] 을(를) 해제했습니다! (무기)");
                     }
                     else
                     {
+                        // 장착 과정 애니메이션 효과
+                        AnsiConsole.Status()
+                            .Spinner(Spinner.Known.Star) // 별 모양 스피너
+                            .SpinnerStyle(Style.Parse("yellow"))
+                            .Start("장비 장착 중...", ctx => {
+                                Thread.Sleep(800); // 처리 중인 효과를 위한 지연
+                            });
                         player.EquippedWeapon = weapon;
                         AnsiConsole.MarkupLine($"[green]{selectedItem.ItemName}[/] 을(를) 장착했습니다! (무기)");
                         Program.quest.QuestRenewal(1, 1); // 장비 장착 퀘스트 판정
@@ -134,11 +146,25 @@ namespace TextRpg
                 {
                     if (player.EquippedArmor == selectedItem)
                     {
+                        // 해제 과정 애니메이션 효과
+                        AnsiConsole.Status()
+                            .Spinner(Spinner.Known.Star) // 별 모양 스피너
+                            .SpinnerStyle(Style.Parse("yellow"))
+                            .Start("장비 해제 중...", ctx => {
+                                Thread.Sleep(800); // 처리 중인 효과를 위한 지연
+                            });
                         player.EquippedArmor = null;
                         AnsiConsole.MarkupLine($"[green]{selectedItem.ItemName}[/] 을(를) 해제했습니다! (방어구)");
                     }
                     else
                     {
+                        // 장착 과정 애니메이션 효과
+                        AnsiConsole.Status()
+                            .Spinner(Spinner.Known.Star) // 별 모양 스피너
+                            .SpinnerStyle(Style.Parse("yellow"))
+                            .Start("장비 장착 중...", ctx => {
+                                Thread.Sleep(800); // 처리 중인 효과를 위한 지연
+                            });
                         player.EquippedArmor = armor;
                         AnsiConsole.MarkupLine($"[green]{selectedItem.ItemName}[/] 을(를) 장착했습니다! (방어구)");
                         Program.quest.QuestRenewal(1, 1); // 장비 장착 퀘스트 판정
@@ -149,7 +175,7 @@ namespace TextRpg
                     AnsiConsole.MarkupLine("[red]장착할 수 없는 아이템입니다.[/]");
                 }
 
-                Console.WriteLine("계속하려면 아무 키나 누르세요...");
+                AnsiConsole.Write(new Rule("[blue]계속하려면 아무 키나 누르세요...[/]"));
                 Console.ReadKey();
             }
         }

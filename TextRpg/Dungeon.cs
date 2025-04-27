@@ -21,8 +21,7 @@ namespace TextRpg
             while (true)
             {
                 Console.Clear();
-                AnsiConsole.MarkupLine("**던전입장**");
-                AnsiConsole.MarkupLine("이곳에서 던전으로 들어가기전 활동을 할 수 있습니다.\n");
+                AnsiConsole.Write(new Rule("[green]이곳에서 던전으로 들어가기전 활동을 할 수 있습니다.[/]"));
                 string[] menus_Seletable = new string[] { "1. 상태 보기", "2. 던전 선택\n", "0. 나가기" };
 
                 var menu = AnsiConsole.Prompt(
@@ -62,8 +61,8 @@ namespace TextRpg
         private void SelectDungeon()
         {
             Console.Clear();
+            AnsiConsole.Write(new Rule($"현재 최고 클리어 단계: [#6cf540]{Program.player.highestClearedStage}단계[/]\n"));
             AnsiConsole.MarkupLine("**던전 선택**");
-            AnsiConsole.MarkupLine($"현재 최고 클리어 단계: [#6cf540]{Program.player.highestClearedStage}단계[/]\n");
 
             // 던전 단계 선택 옵션 생성
             List<string> dungeonOptions = new List<string>();

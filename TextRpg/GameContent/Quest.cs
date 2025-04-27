@@ -172,6 +172,7 @@ namespace TextRpg
         public void PrintQuestList()
         {
             Console.Clear(); // 다른 화면에서 남은 부분이 있을지 모르니 Clear()
+            AnsiConsole.Write(new Rule("[green]퀘스트를 성공해보세요[/]"));
 
             // 선택지 리스트
             List<string> questMenu = new List<string>();
@@ -189,11 +190,11 @@ namespace TextRpg
             // 선택지 프롬프트(여기서 입력 대기)
             var menu = AnsiConsole.Prompt(
            new SelectionPrompt<string>()
-           .Title("[yellow]Quest!![/]")
            .PageSize(quests.Count+1) // 퀘스트 수 + 나가기 메뉴
            .AddChoices(questMenu)
            .WrapAround());
 
+            
             // 선택한 메뉴가 몇번째인가?
             int index = 0;
             foreach (var menus in questMenu)

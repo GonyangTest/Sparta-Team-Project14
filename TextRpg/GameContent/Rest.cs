@@ -14,6 +14,7 @@ namespace TextRpg
             while (true)
             {
                 Console.Clear();
+                AnsiConsole.Write(new Rule("[red]사용[/][green]할 아이템을 선택하세요[/]"));
                 Console.WriteLine("회복");
                 Console.WriteLine($"[포션 아이템]");
                 Console.WriteLine($"체력 포션 | 회복량 +{player.HealthPotion.RecoveryAmount} | 수량 : {player.HealthPotion.Quantity}");
@@ -23,7 +24,6 @@ namespace TextRpg
 
                 var menu = AnsiConsole.Prompt(
                 new SelectionPrompt<string>()
-               .Title("무엇을 하시겠습니까?")
                .PageSize(3) // 항목 수
                .AddChoices(menuArray)
                .WrapAround()); // 리스트 순환 >> 맨 위 항목에서 위 방향키를 누르면 제일 아래 항목으로. 역도 성립

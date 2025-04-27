@@ -58,6 +58,10 @@ namespace TextRpg
                     break;
             }
             Thread.Sleep(GameConstance.Rest.USE_POTION_SLEEP_TIME); // 포션 사용/사용불가 메세지가 출력 후 보여지는 시간이 필요하여 추가
+            while (Console.KeyAvailable)
+            {
+                Console.ReadKey(true); // 버퍼에 남아있는 키를 읽고 버립니다.
+            }
         }
     }
 }

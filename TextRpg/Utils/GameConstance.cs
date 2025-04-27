@@ -81,7 +81,7 @@ namespace TextRpg
 
         public static class Rest
         {
-            public const int USE_POTION_SLEEP_TIME = 300;
+            public const int USE_POTION_SLEEP_TIME = 700;
         }
 
         public static class Sound

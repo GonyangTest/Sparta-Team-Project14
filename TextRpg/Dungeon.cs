@@ -96,7 +96,7 @@ namespace TextRpg
                     if (Program.player.hp <= 0)
                     {
                         AnsiConsole.MarkupLine("플레이어가 사망했습니다. 던전에서 퇴장합니다...");
-                        Thread.Sleep(2000);
+                        Console.ReadKey();
                         SoundManager.Instance.StopMusic();
                         SoundManager.Instance.StartMainMusic();
                         break;
@@ -105,7 +105,7 @@ namespace TextRpg
                     if (!stage.Cleared)
                     {
                         AnsiConsole.MarkupLine("스테이지 클리어에 실패했습니다...");
-                        Thread.Sleep(2000);
+                        Console.ReadKey();
                         SoundManager.Instance.StopMusic();
                         SoundManager.Instance.StartMainMusic();
                         break;
@@ -137,7 +137,7 @@ namespace TextRpg
                     if (index == 1)
                     {
                         AnsiConsole.MarkupLine("던전을 떠납니다...");
-                        Thread.Sleep(1000);
+                        AnsiConsole.Prompt(new SelectionPrompt<string>().AddChoices("다음\n"));
                         SoundManager.Instance.StopMusic();
                         SoundManager.Instance.StartMainMusic();
                         break;
@@ -201,6 +201,10 @@ namespace TextRpg
             Battle();
             AnsiConsole.MarkupLine("계속하려면 아무 키나 누르세요...");
             Console.ReadKey();
+            while (Console.KeyAvailable)
+            {
+                Console.ReadKey(true); // 버퍼에 남아있는 키를 읽고 버립니다.
+            }
         }
 
 
@@ -258,7 +262,13 @@ namespace TextRpg
                     continue;
                 }
                 else if (index == 2)
+                {
+                    while (Console.KeyAvailable)
+                    {
+                        Console.ReadKey(true); // 버퍼에 남아있는 키를 읽고 버립니다.
+                    }
                     return; // 도망
+                }
             }
 
             // 던전 클리어 결과창

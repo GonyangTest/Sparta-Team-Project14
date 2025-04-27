@@ -102,7 +102,7 @@ namespace TextRpg
             return $"Lv.{Level} {Name} HP: {CurrentHP}/{MaxHP}";
         }
 
-        public void Hit(int damage)
+        public void Hit(double damage)
         {
             _currentHP = Math.Max(0, _currentHP - damage);
         }

@@ -54,8 +54,6 @@ namespace TextRpg
         {
             // 치명타 데미지 배율
             public const float CRITICAL_DAMAGE_MULTIPLIER = 1.6f;
-            // 최소 데미지
-            public const int MIN_DAMAGE = 1;
             // 공격 후 대기 시간
             public const int SLEEP_AFTER_ATTACK = 500;
             // 스킬 사용 후 대기 시간
@@ -93,6 +91,11 @@ namespace TextRpg
 
             public const float MAIN_SOUND_VOLUME = 0.05f;
             public const float DUNGEON_SOUND_VOLUME = 0.05f;
+        }
+
+        public static class Inventory
+        {
+            public const int ITEM_EQUIP_SLEEP = 800;
         }
     }
 }

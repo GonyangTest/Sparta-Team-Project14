@@ -118,56 +118,26 @@ namespace TextRpg
                 {
                     if (player.EquippedWeapon == selectedItem)
                     {
-                        // 해제 과정 애니메이션 효과
-                        AnsiConsole.Status()
-                            .Spinner(Spinner.Known.Star) // 별 모양 스피너
-                            .SpinnerStyle(Style.Parse("yellow"))
-                            .Start("장비 해제 중...", ctx => {
-                                Thread.Sleep(800); // 처리 중인 효과를 위한 지연
-                            });
-                        player.EquippedWeapon = null;
-                        AnsiConsole.MarkupLine($"[green]{selectedItem.ItemName}[/] 을(를) 해제했습니다! (무기)");
+                        // 아이템 해제
+                        UnequipItem(player, selectedItem, "무기");
                     }
                     else
                     {
-                        // 장착 과정 애니메이션 효과
-                        AnsiConsole.Status()
-                            .Spinner(Spinner.Known.Star) // 별 모양 스피너
-                            .SpinnerStyle(Style.Parse("yellow"))
-                            .Start("장비 장착 중...", ctx => {
-                                Thread.Sleep(800); // 처리 중인 효과를 위한 지연
-                            });
-                        player.EquippedWeapon = weapon;
-                        AnsiConsole.MarkupLine($"[green]{selectedItem.ItemName}[/] 을(를) 장착했습니다! (무기)");
-                        Program.quest.QuestRenewal(1, 1); // 장비 장착 퀘스트 판정
+                        // 무기 장착
+                        EquipItem(player, weapon, isWeapon: true);
                     }
                 }
                 else if (selectedItem is Armor armor)
                 {
                     if (player.EquippedArmor == selectedItem)
                     {
-                        // 해제 과정 애니메이션 효과
-                        AnsiConsole.Status()
-                            .Spinner(Spinner.Known.Star) // 별 모양 스피너
-                            .SpinnerStyle(Style.Parse("yellow"))
-                            .Start("장비 해제 중...", ctx => {
-                                Thread.Sleep(800); // 처리 중인 효과를 위한 지연
-                            });
-                        player.EquippedArmor = null;
-                        AnsiConsole.MarkupLine($"[green]{selectedItem.ItemName}[/] 을(를) 해제했습니다! (방어구)");
+                        // 아이템 해제
+                        UnequipItem(player, selectedItem, "방어구");
                     }
                     else
                     {
-                        // 장착 과정 애니메이션 효과
-                        AnsiConsole.Status()
-                            .Spinner(Spinner.Known.Star) // 별 모양 스피너
-                            .SpinnerStyle(Style.Parse("yellow"))
-                            .Start("장비 장착 중...", ctx => {
-                                Thread.Sleep(800); // 처리 중인 효과를 위한 지연
-                            });
-                        player.EquippedArmor = armor;
-                        AnsiConsole.MarkupLine($"[green]{selectedItem.ItemName}[/] 을(를) 장착했습니다! (방어구)");
-                        Program.quest.QuestRenewal(1, 1); // 장비 장착 퀘스트 판정
+                        // 방어구 장착
+                        EquipItem(player, armor, isWeapon: false);
                     }
                 }
                 else
@@ -179,6 +149,49 @@ namespace TextRpg
                 Console.ReadKey();
             }
         }
+
+        // 장비 해제 메소드
+        private void UnequipItem(Player player, Item item, string itemType)
+        {
+            // 해제 애니메이션 효과
+            ShowEquipAnimation("장비 해제 중...");
+            
+            // 장비 유형에 따라 해제 처리
+            if (itemType == "무기")
+                player.EquippedWeapon = null;
+            else if (itemType == "방어구")
+                player.EquippedArmor = null;
+                
+            AnsiConsole.MarkupLine($"[green]{item.ItemName}[/] 을(를) 해제했습니다! ({itemType})");
+        }
+        
+        // 장비 장착 메소드
+        private void EquipItem(Player player, Item item, bool isWeapon)
+        {
+            // 장착 애니메이션 효과
+            ShowEquipAnimation("장비 장착 중...");
+            
+            // 장비 유형에 따라 장착 처리
+            if (isWeapon)
+                player.EquippedWeapon = item as Weapon;
+            else
+                player.EquippedArmor = item as Armor;
+                
+            AnsiConsole.MarkupLine($"[green]{item.ItemName}[/] 을(를) 장착했습니다! ({(isWeapon ? "무기" : "방어구")})");
+            Program.quest.QuestRenewal(1, 1); // 장비 장착 퀘스트 판정
+        }
+        
+        // 장착 애니메이션 표시
+        private void ShowEquipAnimation(string message)
+        {
+            AnsiConsole.Status()
+                .Spinner(Spinner.Known.Star)
+                .SpinnerStyle(Style.Parse("yellow"))
+                .Start(message, ctx => {
+                    Thread.Sleep(GameConstance.Inventory.ITEM_EQUIP_SLEEP);
+                });
+        }
+
         public void RemoveItem(Item item)
         {
             if (_inventory.Contains(item))
@@ -186,11 +199,11 @@ namespace TextRpg
                 _inventory.Remove(item);
             }
         }
+        
         public List<Item> GetOwnedItems()
         {
             // 구매한 아이템만 리턴
             return _inventory.Where(i => i.IsPurchased).ToList();
         }
-
     }
 }

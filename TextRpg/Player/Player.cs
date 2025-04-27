@@ -18,6 +18,8 @@ namespace TextRpg
         public double exp = GameConstance.Player.INITIAL_EXP;
         public int maxExp = GameConstance.Player.INITIAL_MAX_EXP;
         public int gold = GameConstance.Player.INITIAL_GOLD;
+        
+        // 스탯
         public int hp;
         public int mana;
         public int maxHp;
@@ -26,93 +28,135 @@ namespace TextRpg
         public int defense;
         public int agility;
         public int criticalChance;
+        
+        // 직업 및 진행 정보
         public Job SelectedJob;
         public int highestClearedStage = 0; // 최고 스테이지 저장
-
+        
+        // 아이템
         public ConsumableItem HealthPotion = ItemFactory.CreateConsumableItem(GameConstance.Item.HEALTH_POTION_NAME, 3);
         public ConsumableItem ManaPotion = ItemFactory.CreateConsumableItem(GameConstance.Item.MANA_POTION_NAME, 3);
-
+        
         public Item EquippedWeapon;
         public Item EquippedArmor;
 
+        public string JobName // TODO: job 이름 중복 사용으로 playerName 제거 필요
+        {
+            get { return SelectedJob.Name; }
+        }
+        
+        // 계산된 속성 - 무기 보너스를 포함한 총 공격력
+        public float totalPower
+        {
+            get
+            {
+                float weaponBonus = EquippedWeapon is Weapon w ? w.Attack : 0;
+                return power + weaponBonus;
+            }
+        }
+
+        // 계산된 속성 - 방어구 보너스를 포함한 총 방어력
+        public int totalDefense
+        {
+            get
+            {
+                int armorBonus = EquippedArmor is Armor a ? a.Defense : 0;
+                return defense + armorBonus;
+            }
+        }
+
         public void SetPlayer()
         {
-            Console.Clear();
-            AnsiConsole.MarkupLine("스파르타 던전에 오신 여러분 환영합니다.");
-            var userName = AnsiConsole.Prompt(
-                new TextPrompt<string>("[bold]원하시는 이름을 설정해주세요:[/]")
-                .PromptStyle("white")
-                .DefaultValue("[dim gray]예) 스파르타 전사[/]")
-                .AllowEmpty());
-
-            playerName = userName;
-            List<string> userNameList = new List<string>()
-            {
-                "1. 저장",
-                "2. 취소"
-            };
-
-
-
-            Console.Clear();
+            List<string> playerNameSaveMenu = new List<string>() { "1. 저장", "2. 취소" };
+            playerName = DecidePlayerName();
+            
+            AnsiConsole.Clear();
             AnsiConsole.MarkupLine($"입력하신 이름은 [bold]'{playerName}'[/]입니다.\n");
             var choice = AnsiConsole.Prompt(
                 new SelectionPrompt<string>()
                     .Title("원하시는 행동을 선택해주세요.")
                     .PageSize(10)
-                    .AddChoices(userNameList)
+                    .AddChoices(playerNameSaveMenu)
                     .WrapAround());
 
             int index = int.Parse(choice.Split('.')[0]);
 
-
             switch (index)
             {
                 case 1:
-                    playerName = userName;
                     break;
                 case 2:
                     Console.Clear();
+                    playerName = DecidePlayerName(); // 취소 시 다시 이름 설정
                     break;
             }
-
-            List<string> jobList = new List<string>()
-            {
-                "1. 전사",
-                "2. 도적",
-                "3. 궁수",
-                "4. 마법사"
-            };
-
-            Console.Clear();
-            Console.WriteLine("스파르타 던전에 오신 여러분 환영합니다.");
-            Console.WriteLine("원하시는 직업을 설정해주세요.\n");
             
-            choice = AnsiConsole.Prompt(
-                new SelectionPrompt<string>()
-                    .Title("원하시는 직업을 선택해주세요.")
-                    .PageSize(10)
-                    .AddChoices(jobList)
-                    .WrapAround());
-
-            index = int.Parse(choice.Split('.')[0]);
-
-            SelectedJob = Job.JobList[index];
-            // TODO: 나중에 구조 변경 필요
-            playerClass = SelectedJob.Name;
-            hp = SelectedJob.Hp;
-            mana = SelectedJob.Mana;
-            maxHp = SelectedJob.MaxHp;
-            maxMp = SelectedJob.MaxMp;
-            power = SelectedJob.Power;
-            defense = SelectedJob.Defense;
-            agility = SelectedJob.Agility;
-            criticalChance = SelectedJob.CriticalChance;
+            SelectJob();
 
             // 새로 시작할 때 퀘스트 데이터 초기화 필요
             Program.quest.InitQuestData();
         }
 
+        private string DecidePlayerName() {
+            AnsiConsole.Clear();
+            AnsiConsole.MarkupLine("스파르타 던전에 오신 여러분 환영합니다.");
+            var name = AnsiConsole.Prompt(
+                new TextPrompt<string>("[bold]원하시는 이름을 설정해주세요:[/]")
+                .PromptStyle("white")
+                .DefaultValue("[dim gray]예) 스파르타 전사[/]")
+                .AllowEmpty());
+            
+            return string.IsNullOrEmpty(name) ? "스파르타 전사" : name;
+        }
+
+        // 직업 선택
+        private void SelectJob()
+        {
+            AnsiConsole.Clear();
+            AnsiConsole.MarkupLine("스파르타 던전에 오신 여러분 환영합니다.");
+            AnsiConsole.MarkupLine("원하시는 직업을 설정해주세요.\n");
+
+            // JobType 목록 가져오기
+            List<JobType> jobTypes = Job.GetJobTypes();
+            
+            // 선택 프롬프트 생성
+            var selection = AnsiConsole.Prompt(
+                new SelectionPrompt<JobType>()
+                    .Title("원하시는 직업을 선택해주세요.")
+                    .PageSize(10)
+                    .AddChoices(jobTypes)
+                    .UseConverter(jobType => {
+                        // 직업 이름 가져오기 (Description 어트리뷰트 사용)
+                        string jobName = EnumUtils.GetDescription(jobType);
+                        // 인덱스 계산
+                        int index = Array.IndexOf(Enum.GetValues(typeof(JobType)), jobType) + 1;
+                        return $"{index}. {jobName}";
+                    }) 
+                    .WrapAround());
+
+            // 해당 JobType으로 Job 할당
+            SelectedJob = Job.JobList[selection];
+            
+            InitializeJobStats();
+        }
+
+        // 직업 기반 캐릭터 스탯 초기화
+        private void InitializeJobStats()
+        {
+            if (SelectedJob == null) return;
+
+            playerClass = SelectedJob.Name;
+            hp = SelectedJob.Hp;
+            mana = SelectedJob.Mana;
+            maxHp = SelectedJob.Hp;
+            maxMp = SelectedJob.Mana;
+            power = SelectedJob.Power;
+            defense = SelectedJob.Defense;
+            agility = SelectedJob.Agility;
+            criticalChance = SelectedJob.CriticalChance;
+        }
+
+        // 체력 포션 사용
         public bool UseHealthPotion()
         {
             if (hp >= maxHp)
@@ -136,14 +180,16 @@ namespace TextRpg
             return ManaPotion.Use(this);
         }
 
+        // 데미지를 받았을 때 체력 감소
         public void Hit(int hp_decrease)
         {
             hp = Math.Clamp(hp - hp_decrease, 0, maxHp);
         }
 
+        // 경험치 획득
         public void AddExp(double expAmount)
         {
-            exp += expAmount; // 매개변수만큼 경험치를 더하고
+            exp += expAmount;
             LevelUp(); // 레벨업 체크
         }
 
@@ -155,13 +201,12 @@ namespace TextRpg
                 level++;
                 exp -= maxExp;
 
-                // 필요 경험치 증가량 로직 생성
+                // 필요 경험치 증가량 로직 계산
                 int increase = 25 + (level - 2) * 5;
                 maxExp += increase;
 
-                // 레벨업시 공격력 0.5증가 방어력 1증가
-                power += GameConstance.Player.LEVEL_UP_POWER_INCREASE;
-                defense += GameConstance.Player.LEVEL_UP_DEFENSE_INCREASE;
+                // 레벨업 시 능력치 증가
+                ApplyLevelUpBonuses();
 
                 // 레벨 달성 퀘스트 판정
                 Program.quest.QuestRenewal(2, level);
@@ -170,34 +215,24 @@ namespace TextRpg
                 AnsiConsole.MarkupLine($"[yellow]{playerName}[/] 의 레벨이 [yellow]{level}[/] 로 올랐습니다.");
             }
         }
-        public float totalPower
+
+        // 레벨업 시 능력치 증가 적용
+        private void ApplyLevelUpBonuses()
         {
-            get
-            {
-                float weaponBonus = EquippedWeapon is Weapon w ? w.Attack : 0;
-                return power + weaponBonus;
-            }
+            power += GameConstance.Player.LEVEL_UP_POWER_INCREASE;
+            defense += GameConstance.Player.LEVEL_UP_DEFENSE_INCREASE;
         }
 
-        public int totalDefense
-        {
-            get
-            {
-                int armorBonus = EquippedArmor is Armor a ? a.Defense : 0;
-                return defense + armorBonus;
-            }
-        }
-        //스킬 데미지
+        // 스킬 데미지 계산
         public int SkillPower(Skill skill)
         {
-            int skillPower = (int)(totalPower * skill.PowerMultiplier);
-            return skillPower;
+            return (int)(totalPower * skill.PowerMultiplier);
         }
-        //크리티컬 데미지
+        
+        // 크리티컬 데미지 계산
         public int CriticalDamage()
         {
-            int criticalDamage = (int)(totalPower * GameConstance.Player.CRITICAL_DAMAGE_MULTIPLIER);
-            return criticalDamage;
+            return (int)(totalPower * GameConstance.Player.CRITICAL_DAMAGE_MULTIPLIER);
         }
 
         public string PrintPlayer()

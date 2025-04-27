@@ -19,48 +19,16 @@ namespace TextRpg
         private int _dropGold;
         private string _art; // 몬스터 아스키 아트 저장
 
-        public int Stage { 
-            get => _stage; 
-        }
-        
-        public string Name { 
-            get => _name; 
-        }
-        
-        public int Level { 
-            get => _level; 
-        }
-        
-        public int MaxHP { 
-            get => _maxHP; 
-        }
-        
-        public double CurrentHP { 
-            get => _currentHP; 
-            set => _currentHP = Math.Max(0, Math.Min(value, _maxHP));
-        }
-        
-        public int Attack { 
-            get => _attack; 
-        }
-        
-        public int Defense { 
-            get => _defense; 
-        }
-        
-        public int DropExp { 
-            get => _dropExp; 
-        }
-        
-        public int DropGold { 
-            get => _dropGold; 
-        }
-        
+        public int Stage { get => _stage; }
+        public string Name { get => _name; }
+        public int Level { get => _level; }
+        public int MaxHP { get => _maxHP; }
+        public double CurrentHP { get => _currentHP; set => _currentHP = Math.Max(0, Math.Min(value, _maxHP));}
+        public int Attack { get => _attack; }
+        public int Defense { get => _defense; }
+        public int DropExp { get => _dropExp; }
+        public int DropGold { get => _dropGold; }
         public bool IsAlive => _currentHP > 0;
-
-        public string Art { 
-            get => _art; 
-        }
 
         // 생성자 추가
         public Monster()
@@ -86,15 +54,6 @@ namespace TextRpg
         public void SetArt(string art)
         {
             _art = art;
-        }
-
-        // 몬스터 아트 출력 메서드
-        public void DisplayArt()
-        {
-            if (!string.IsNullOrEmpty(_art))
-            {
-                Console.WriteLine(_art);
-            }
         }
 
         public override string ToString()

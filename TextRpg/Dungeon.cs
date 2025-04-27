@@ -704,15 +704,24 @@ namespace TextRpg
             MonsterCounterAttack();
         }
 
-        void PrintSkill(bool isSelected)
+        // 스킬 선택 UI 출력
+        void PrintSkill(Skill skill, bool isSelected)
         {
-            var panel = new Panel("[yellow]던전 뿌셔[/]\n\n<< 보상 >>\n경험치: +100 Exp\n골드: +1000G\n\n아이템\n스파르타 무언가"); // 패널 생성 및 안에 들어갈 내용
-            // 테두리 스타일(Rounded, Square, Ascii, None 등) Double, Heavy는 제대로 출력이 안되는 듯함
-            panel.Border = BoxBorder.Rounded;
-            // 패널 상단 중앙에 제목 적기(왼쪽, 오른쪽으로도 변경 가능)
-            panel.Header = new PanelHeader("[yellow bold]퀘스트 완료[/]", Justify.Center);
-            if()
-            panel.BorderColor(Color.Blue);
+            Panel panel = null;
+            string info = $"{(skill.Type == SkillType.Single ? "적 하나" : "적 전체")}에 공격력의 {skill.PowerMultiplier}만큼 피해를 줍니다.\n마나 소모: {skill.ManaCost})";
+            if (isSelected)
+            {
+                panel = new Panel($"[blue]{info}[/]");
+                panel.Border = BoxBorder.Rounded;
+                panel.Header = new PanelHeader($"[blue]< {skill.Name} >[/]", Justify.Center);
+                panel.BorderColor(Color.Blue);
+            }
+            else
+            {
+                panel = new Panel(info); // 패널 생성 및 안에 들어갈 내용
+                panel.Border = BoxBorder.Rounded;
+                panel.Header = new PanelHeader($"< {skill.Name} >", Justify.Center);
+            }
             // 패널 출력
             AnsiConsole.Write(panel);
         }
@@ -728,7 +737,7 @@ namespace TextRpg
             // 스킬이 없다면
             if (jobSkills.Count == 0)
             {
-                AnsiConsole.MarkupLine("사용 가능한 스킬이 없습니다.");
+                AnsiConsole.MarkupLine("[red]사용 가능한 스킬이 없습니다.[/]");
                 Console.ReadKey();
                 return;
             }
@@ -741,14 +750,15 @@ namespace TextRpg
                 AnsiConsole.MarkupLine($"{i + 1}. {s.Name} (배수: {s.PowerMultiplier}, 마나 소모: {s.ManaCost})");
             }
 
-            Console.Write("\n사용할 스킬 번호를 선택하세요 >> ");
-            string input = Console.ReadLine();
-            if (!int.TryParse(input, out int selected) || selected < 1 || selected > jobSkills.Count)
-            {
-                AnsiConsole.MarkupLine("잘못된 입력입니다.");
-                Console.ReadKey();
-                return;
-            }
+            // 이런 방식으로 번호 입력 구현.. 했으나 선택지로 변경
+            //Console.Write("\n사용할 스킬 번호를 선택하세요 >> ");
+            //string input = Console.ReadLine();
+            //if (!int.TryParse(input, out int selected) || selected < 1 || selected > jobSkills.Count)
+            //{
+            //    AnsiConsole.MarkupLine("잘못된 입력입니다.");
+            //    Console.ReadKey();
+            //    return;
+            //}
 
             Skill chosenSkill = jobSkills[selected - 1];
 
@@ -797,10 +807,11 @@ namespace TextRpg
                 return; // 함수 종료
             }
 
-            // 몬스터의 반격 페이즈
+            
             MonsterCounterAttack();
         }
 
+        // 몬스터의 반격 페이즈
         private void MonsterCounterAttack()
         {
             // 반격할 몬스터가 없는데 반격하는 경우 방지

@@ -8,7 +8,7 @@ namespace TextRpg
 {
     public class Armor : Item
     {// Item을 상속받는 상속클래스
-        private int _defense;
+        public int _defense;
 
         public int Defense // 방어구의 방어력
         {

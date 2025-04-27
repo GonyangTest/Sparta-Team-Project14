@@ -11,7 +11,7 @@ internal class Program
     internal static Inventory inventory = new Inventory();
     internal static Quest quest = new Quest();
     internal static Shop shop;
-    
+
 
     static void Main(string[] args)
     {
@@ -23,21 +23,24 @@ internal class Program
         {
             Console.WriteLine("저장된 기록이 있습니다. 불러오시겠습니까?");
             List<string> startMenu = new List<string>
-                {
-                    "1. 불러오기",
-                    "2. 새 시작",
-                    "0. 게임종료"
-                };
+                   {
+                       "1. 불러오기",
+                       "2. 새 시작",
+                       "0. 게임종료"
+                   };
             var startChoice = AnsiConsole.Prompt(
                 new SelectionPrompt<string>()
                     .Title("원하시는 [green]행동[/]을 선택해주세요.")
                     .PageSize(10)
-                    .AddChoices(startMenu));
+                    .AddChoices(startMenu)
+                    .WrapAround(true)); 
 
             int index = int.Parse(startChoice.Split('.')[0]);
             switch (index)
             {
                 case 0:
+                    Console.WriteLine("게임이 종료되었습니다.");  // 종료 메시지 출력
+                    Environment.Exit(0);
                     break;
                 case 1:
                     shop ??= new Shop(player);
@@ -57,7 +60,7 @@ internal class Program
                     break;
 
             }
-            
+
         }
         else
         {

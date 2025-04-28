@@ -61,6 +61,11 @@ namespace TextRpg
         Dictionary<int, int> questData = new Dictionary<int, int>();
 
         public Dictionary<int, int> Get_questData() { return questData; }
+        internal void Set_questData(int questNum, int count)
+        {
+            if(questData.ContainsKey(questNum))
+                questData[questNum] = count;
+        }
 
         public Quest() // 퀘스트 초기화
         {
@@ -277,10 +282,11 @@ namespace TextRpg
                 count = addCount; 
             else
                 count += addCount;
-
+            // 달성도 저장
+            Program.quest.Set_questData(questIndex, count);
             // 달성하지 않은 퀘스트의 목표를 달성했을 때 
             if (count >= goal) 
-            {  
+            {
                 isAccomplish = true; // 달성 상태 기록
                 Program.quest.Get_questData().Remove(questIndex); // 달성한 퀘스트는 데이터 딕셔너리에서 제거
                 Reward(); // 보상 지급

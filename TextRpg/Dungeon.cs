@@ -119,7 +119,7 @@ namespace TextRpg
             foreach (Stage stage in _stages)
             {
                 stage.Start();
-                if (Program.player.hp <= 0)
+                if (Program.player.hp == 0)
                 {
                     AnsiConsole.MarkupLine("플레이어가 사망했습니다. 던전에서 퇴장합니다...");
                     Thread.Sleep(2000);
@@ -213,6 +213,11 @@ namespace TextRpg
                 // 몬스터가 다 죽었을 때는 루프를 빠져나가서 보상을 받을 수 있도록 변경
                 while (true)
                 {
+                    if (Program.player.hp <= 0)
+                    {
+                        Program.player.hp = 0; // 체력을 0으로 설정
+                        break; // 전투 종료
+                    }
                     if (Monsters.All(m => m.CurrentHP <= 0))
                     {
                         // 모든 몬스터가 죽었으면 전투 종료하고 결과 화면으로 바로 넘어감
@@ -1038,6 +1043,7 @@ namespace TextRpg
 
                         // 플레이어가 사망하면 계산 종료하고 던전 빠져나가게끔
                         if (Program.player.hp <= 0)
+                            Program.player.hp = 0;
                             return;
 
                         // 다음 몬스터 공격까지 딜레이
